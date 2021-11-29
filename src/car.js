@@ -36,6 +36,7 @@ function Car(config) {
   car.add(frontWheel);
 
   if (config.showHitZones) {
+    // TODO: HitZone is nod defined
     car.userData.hitZone1 = HitZone();
     car.userData.hitZone2 = HitZone();
   }
