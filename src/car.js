@@ -4,7 +4,7 @@ function Car(config) {
   const color = 0xa52523;
 
   const main = new THREE.Mesh(
-    new THREE.BoxBufferGeometry(60, 30, 15),
+    new THREE.BoxBufferGeometry(15, 15, 15), // original: new THREE.BoxBufferGeometry(60, 30, 15),
     new THREE.MeshLambertMaterial({color}),
   );
   main.position.z = 12;
@@ -12,28 +12,28 @@ function Car(config) {
   main.receiveShadow = true;
   car.add(main);
 
-  const windowColor = 0xffffff;
-  const cabin = new THREE.Mesh(new THREE.BoxBufferGeometry(33, 24, 12), [
-    new THREE.MeshLambertMaterial({color: windowColor}),
-    new THREE.MeshLambertMaterial({color: windowColor}),
-    new THREE.MeshLambertMaterial({color: windowColor}),
-    new THREE.MeshLambertMaterial({color: windowColor}),
-    new THREE.MeshLambertMaterial({color: 0xffffff}), // top
-    new THREE.MeshLambertMaterial({color: 0xffffff}), // bottom
-  ]);
-  cabin.position.x = -6;
-  cabin.position.z = 25.5;
-  cabin.castShadow = true;
-  cabin.receiveShadow = true;
-  car.add(cabin);
+  // const windowColor = 0xffffff;
+  // const cabin = new THREE.Mesh(new THREE.BoxBufferGeometry(33, 24, 12), [
+  //   new THREE.MeshLambertMaterial({color: windowColor}),
+  //   new THREE.MeshLambertMaterial({color: windowColor}),
+  //   new THREE.MeshLambertMaterial({color: windowColor}),
+  //   new THREE.MeshLambertMaterial({color: windowColor}),
+  //   new THREE.MeshLambertMaterial({color: 0xffffff}), // top
+  //   new THREE.MeshLambertMaterial({color: 0xffffff}), // bottom
+  // ]);
+  // cabin.position.x = -6;
+  // cabin.position.z = 25.5;
+  // cabin.castShadow = true;
+  // cabin.receiveShadow = true;
+  // car.add(cabin);
 
-  const backWheel = new Wheel();
-  backWheel.position.x = -18;
-  car.add(backWheel);
+  // const backWheel = new Wheel();
+  // backWheel.position.x = -18;
+  // car.add(backWheel);
 
-  const frontWheel = new Wheel();
-  frontWheel.position.x = 18;
-  car.add(frontWheel);
+  // const frontWheel = new Wheel();
+  // frontWheel.position.x = 18;
+  // car.add(frontWheel);
 
   if (config.showHitZones) {
     // TODO: HitZone is nod defined
