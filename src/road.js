@@ -63,11 +63,15 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
   context.stroke();
 
   // draw conflict zones
-  context.lineWidth = LINE_WIDTH;
+  context.lineWidth = LINE_WIDTH - 1;
   context.strokeStyle = '#000000';
   context.setLineDash([]);
   const gridWidth = intersectionArea.width / nZones;
   const gridHeight = intersectionArea.height / nZones;
+
+  // TODO: export gridWidth and gridHeight (need refactor)
+  window.gridWidth = gridWidth;
+  window.gridHeight = gridHeight;
 
   for (let i = 0; i <= nZones; i++) {
     const offsetX = i * gridWidth;
