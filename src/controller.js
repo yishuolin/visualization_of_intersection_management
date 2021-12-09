@@ -1,11 +1,10 @@
-import {FRAME_TIME, START, END} from './constants';
-const speed = 0.0017;
+import {FRAME_TIME, START, END, LEFT, RIGHT, UP, DOWN} from './constants';
+
 const playerAngleInitial = Math.PI;
 let playerAngleMoved = 0;
 
 const getPlayerSpeed = () => {
-  const {gridWidth} = window;
-  return speed;
+  return window.gridWidth / FRAME_TIME;
 };
 
 const move = (car, timestamp, timeDelta) => {
@@ -26,15 +25,15 @@ const move = (car, timestamp, timeDelta) => {
     return;
   }
 
-  if (car.prevTrajectory === 'right' && toZone.x > atZone.x) {
+  if (car.prevTrajectory === RIGHT && toZone.x > atZone.x) {
     moveRight(car, timeDelta);
-  } else if (car.prevTrajectory === 'left' && toZone.x < atZone.x) {
+  } else if (car.prevTrajectory === LEFT && toZone.x < atZone.x) {
     moveLeft(car, timeDelta);
-  } else if (car.prevTrajectory === 'up' && toZone.y > atZone.y) {
+  } else if (car.prevTrajectory === UP && toZone.y > atZone.y) {
     moveUp(car, timeDelta);
-  } else if (car.prevTrajectory === 'down' && toZone.y < atZone.y) {
+  } else if (car.prevTrajectory === DOWN && toZone.y < atZone.y) {
     moveDown(car, timeDelta);
-  } else if (car.prevTrajectory === 'right' && toZone.y > atZone.y) {
+  } else if (car.prevTrajectory === RIGHT && toZone.y > atZone.y) {
     car.onLane = 4;
     if (!car.hasTurned) {
       car.hasTurned = true;
@@ -48,32 +47,33 @@ const move = (car, timestamp, timeDelta) => {
 };
 
 const moveCarByLane = (car, timestamp, timeDelta) => {
-  // TODO: need to consider other lanes
-  if (car.onLane === 1) {
-    moveRight(car, timeDelta);
-  } else if (car.onLane === 4) {
-    moveUp(car, timeDelta);
-  }
+  const laneSwitch = {
+    1: moveRight,
+    2: moveLeft,
+    3: moveDown,
+    4: moveUp,
+  };
+  laneSwitch[car.onLane](car, timeDelta);
 };
 
 const moveRight = (car, timeDelta) => {
   const playerSpeed = getPlayerSpeed();
-  car.position.x += playerSpeed * timeDelta * 70;
+  car.position.x += playerSpeed * timeDelta;
 };
 
 const moveLeft = (car, timeDelta) => {
   const playerSpeed = getPlayerSpeed();
-  car.position.x -= playerSpeed * timeDelta * 70;
+  car.position.x -= playerSpeed * timeDelta;
 };
 
 const moveUp = (car, timeDelta) => {
   const playerSpeed = getPlayerSpeed();
-  car.position.y += playerSpeed * timeDelta * 70;
+  car.position.y += playerSpeed * timeDelta;
 };
 
 const moveDown = (car, timeDelta) => {
   const playerSpeed = getPlayerSpeed();
-  car.position.y -= playerSpeed * timeDelta * 70;
+  car.position.y -= playerSpeed * timeDelta;
 };
 
 const turnLeft = (car, timeDelta) => {

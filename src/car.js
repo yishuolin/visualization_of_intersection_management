@@ -1,3 +1,5 @@
+import {nZones, LEFT, RIGHT, UP, DOWN} from './constants';
+
 function Car(config) {
   const car = new THREE.Group();
 
@@ -21,18 +23,17 @@ function Car(config) {
   car.zones = [
     {x: 0, y: 0},
     {x: 0, y: 0},
-    {x: 0, y: 0},
     {x: 1, y: 0},
-    {x: 1, y: 0},
-    {x: 1, y: 1},
     {x: 1, y: 1},
   ];
-  car.currentPosition = {x: -150, y: -130, z: 0};
-  car.nextPosition = {x: 100, y: -150, z: 0};
-  car.currentRotation = {x: 0, y: 0, z: 0};
-  car.nextRotation = {x: 0, y: 0, z: 0};
+  // TODO: should be more responsive to handle nZones changes
+  car.currentPosition = {
+    x: -window.intersectionArea.width / nZones,
+    y: -window.intersectionArea.height / nZones / 2,
+    z: 0,
+  };
   car.onLane = 1;
-  car.prevTrajectory = 'right';
+  car.prevTrajectory = RIGHT;
   // turn
   car.startTurnLeft = 0;
   car.radius = 0;

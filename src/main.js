@@ -43,13 +43,13 @@ const arcCenterX =
 
 const scene = new THREE.Scene();
 
-const playerCar = Car(config);
-scene.add(playerCar);
-
 // scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original: The map height is higher because we look at the map from an angle
 scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
 scene.add(ambientLight);
 scene.add(dirLight);
+
+const playerCar = Car(config);
+scene.add(playerCar);
 // const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
 // scene.add(cameraHelper);
 
