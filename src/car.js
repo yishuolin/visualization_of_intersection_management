@@ -24,6 +24,7 @@ function Car(config) {
     {x: 0, y: 0},
     {x: 0, y: 0},
     {x: 1, y: 0},
+    {x: 1, y: 0},
     {x: 1, y: 1},
   ];
   // TODO: should be more responsive to handle nZones changes
@@ -32,12 +33,16 @@ function Car(config) {
     y: -window.intersectionArea.height / nZones / 2,
     z: 0,
   };
+  car.position.x = car.currentPosition.x;
+  car.position.y = car.currentPosition.y;
   car.onLane = 1;
   car.prevTrajectory = RIGHT;
   // turn
   car.startTurnLeft = 0;
   car.radius = 0;
   car.hasTurned = false;
+
+  car.mesh = main;
   return car;
 }
 

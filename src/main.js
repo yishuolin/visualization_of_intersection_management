@@ -4,7 +4,6 @@ import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
 import {nZones, FRAME_TIME, ANIMATION_TIME} from './constants';
-window.focus(); // Capture keys right away (by default focus is on editor)
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -43,7 +42,7 @@ const arcCenterX =
 
 const scene = new THREE.Scene();
 
-// scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original: The map height is higher because we look at the map from an angle
+// scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
 scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
 scene.add(ambientLight);
 scene.add(dirLight);
@@ -99,8 +98,7 @@ function reset() {
 
   ready = true;
 }
-playerCar.position.x = playerCar.currentPosition.x;
-playerCar.position.y = playerCar.currentPosition.y;
+
 startGame();
 function startGame() {
   if (ready) {
@@ -110,7 +108,20 @@ function startGame() {
 }
 
 let startTimestamp = 0;
-function animation(timestamp) {
+let resumeTimestamp = 0;
+let pauseTimestamp = 0;
+let pause = false;
+let resume = false;
+
+function animation(originalTimestamp) {
+  const timestamp = pauseTimestamp + originalTimestamp - resumeTimestamp;
+
+  if (resume) {
+    resumeTimestamp = originalTimestamp;
+    resume = false;
+    return;
+  }
+
   // init lastTimestamp
   if (!lastTimestamp) {
     lastTimestamp = timestamp;
@@ -130,4 +141,68 @@ function animation(timestamp) {
 
   renderer.render(scene, camera);
   lastTimestamp = timestamp;
+
+  // TODO: need refactor
+  document.getElementById('stop').addEventListener('click', () => {
+    pauseTimestamp = timestamp;
+    renderer.setAnimationLoop(null);
+  });
+  document.getElementById('resume').addEventListener('click', () => {
+    resume = true;
+    renderer.setAnimationLoop(animation);
+  });
 }
+
+/*
+// Another Animation System
+// https://blog.csdn.net/ithanmang/article/details/84062933
+// https://stackoverflow.com/questions/40434314/threejs-animationclip-example-needed
+
+// POSITION
+playerCar.name = 'playerCar';
+const positionKF = new THREE.KeyframeTrack(
+  'playerCar.position',
+  [0, 2],
+  [0, 0, 0, 100, 100, 0],
+);
+
+// ROTATION
+// set up rotation about x axis
+const zAxis = new THREE.Vector3(0, 0, 1);
+
+var qInitial = new THREE.Quaternion().setFromAxisAngle(zAxis, 0);
+var qFinal = new THREE.Quaternion().setFromAxisAngle(zAxis, Math.PI / 2);
+var quaternionKF = new THREE.QuaternionKeyframeTrack(
+  '.quaternion',
+  [0, 1],
+  [
+    qInitial.x,
+    qInitial.y,
+    qInitial.z,
+    qInitial.w,
+    qFinal.x,
+    qFinal.y,
+    qFinal.z,
+    qFinal.w,
+  ],
+);
+
+// create an animation sequence with the tracks
+// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
+const clip = new THREE.AnimationClip('action', 2, [positionKF, quaternionKF]);
+
+// setup the AnimationMixer
+const mixer = new THREE.AnimationMixer(playerCar);
+
+// create a ClipAction and set it to play
+const clipAction = mixer.clipAction(clip);
+clipAction.setLoop(THREE.LoopOnce).play();
+
+const clock = new THREE.Clock();
+const _animate = () => {
+  requestAnimationFrame(_animate);
+  renderer.render(scene, camera);
+  mixer.update(clock.getDelta());
+};
+_animate();
+*/
