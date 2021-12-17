@@ -1,4 +1,34 @@
-import {nZones, LEFT, RIGHT, UP, DOWN} from './constants';
+import {
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN,
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+} from './constants';
+
+const getStartTrajectory = {
+  [LANE_1]: RIGHT,
+  [LANE_2]: LEFT,
+  [LANE_3]: DOWN,
+  [LANE_4]: UP,
+};
+
+const getPlayerAngleInitial = {
+  [LANE_1]: (Math.PI / 2) * 3,
+  [LANE_2]: Math.PI / 2,
+  [LANE_3]: Math.PI,
+  [LANE_4]: 0,
+};
+
+const getRotationZ = {
+  [LANE_1]: 0,
+  [LANE_2]: Math.PI,
+  [LANE_3]: (Math.PI / 2) * 3,
+  [LANE_4]: Math.PI / 2,
+};
 
 function Car(config) {
   const car = new THREE.Group();
@@ -7,6 +37,7 @@ function Car(config) {
 
   const main = new THREE.Mesh(
     new THREE.BoxBufferGeometry(60, 30, 15),
+    // new THREE.BoxBufferGeometry(30, 30, 15),
     new THREE.MeshLambertMaterial({color}),
   );
   main.position.z = 12;
@@ -14,33 +45,17 @@ function Car(config) {
   main.receiveShadow = true;
   car.add(main);
 
-  if (config.showHitZones) {
-    // TODO: HitZone is nod defined
-    car.userData.hitZone1 = HitZone();
-    car.userData.hitZone2 = HitZone();
-  }
-
-  car.zones = [
-    {x: 0, y: 0},
-    {x: 0, y: 0},
-    {x: 1, y: 0},
-    {x: 1, y: 0},
-    {x: 1, y: 1},
-  ];
-  // TODO: should be more responsive to handle nZones changes
-  car.currentPosition = {
-    x: -window.intersectionArea.width / nZones,
-    y: -window.intersectionArea.height / nZones / 2,
-    z: 0,
-  };
-  car.position.x = car.currentPosition.x;
-  car.position.y = car.currentPosition.y;
-  car.onLane = 1;
-  car.prevTrajectory = RIGHT;
+  car.zones = config.zones;
+  car.position.x = config.position.x;
+  car.position.y = config.position.y;
+  car.onLane = config.onLane;
+  car.prevTrajectory = getStartTrajectory[config.onLane];
+  car.rotation.z = getRotationZ[config.onLane];
   // turn
-  car.startTurnLeft = 0;
-  car.radius = 0;
   car.hasTurned = false;
+  car.radius = 0;
+  car.playerAngleMoved = 0;
+  car.playerAngleInitial = getPlayerAngleInitial[config.onLane];
 
   car.mesh = main;
   return car;

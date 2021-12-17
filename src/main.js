@@ -3,7 +3,15 @@ import {camera, cameraWidth, cameraHeight} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
-import {nZones, FRAME_TIME, ANIMATION_TIME} from './constants';
+import {
+  nZones,
+  FRAME_TIME,
+  ANIMATION_TIME,
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+} from './constants';
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -15,30 +23,15 @@ function getDistance(coordinate1, coordinate2) {
 
 const config = {
   showHitZones: false,
-  shadows: true, // Use shadow
-  trees: true, // Add trees to the map
-  curbs: true, // Show texture on the extruded geometry
+  shadows: false, // Use shadow
+  trees: false, // Add trees to the map
+  curbs: false, // Show texture on the extruded geometry
   grid: false, // Show grid helper
 };
 
 let otherVehicles = [];
 let ready;
 let lastTimestamp;
-
-const trackRadius = 225;
-const trackWidth = 45;
-const innerTrackRadius = trackRadius - trackWidth;
-const outerTrackRadius = trackRadius + trackWidth;
-
-const arcAngle1 = (1 / 3) * Math.PI; // 60 degrees
-
-const deltaY = Math.sin(arcAngle1) * innerTrackRadius;
-const arcAngle2 = Math.asin(deltaY / outerTrackRadius);
-
-const arcCenterX =
-  (Math.cos(arcAngle1) * innerTrackRadius +
-    Math.cos(arcAngle2) * outerTrackRadius) /
-  2;
 
 const scene = new THREE.Scene();
 
@@ -47,16 +40,83 @@ scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height ==
 scene.add(ambientLight);
 scene.add(dirLight);
 
-const playerCar = Car(config);
-scene.add(playerCar);
-// const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
-// scene.add(cameraHelper);
+const carsConfig = [
+  {
+    zones: [
+      {x: 0, y: 0},
+      {x: 0, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: -window.intersectionArea.width / nZones,
+      y: -window.intersectionArea.height / nZones / 2,
+    },
+    onLane: LANE_1,
+  },
+  {
+    zones: [
+      {x: 1, y: 1},
+      {x: 0, y: 1},
+      {x: 0, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: window.intersectionArea.width / nZones,
+      y: window.intersectionArea.height / nZones / 2,
+    },
+    onLane: LANE_2,
+  },
+  {
+    zones: [
+      {x: 1, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+      {x: 0, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: window.intersectionArea.width / nZones / 2,
+      y: -window.intersectionArea.height / nZones,
+    },
+    onLane: LANE_4,
+  },
+  {
+    zones: [
+      {x: 0, y: 1},
+      {x: 0, y: 1},
+      {x: 0, y: 0},
+      {x: 0, y: 0},
+      {x: 1, y: 0},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: -window.intersectionArea.width / nZones / 2,
+      y: window.intersectionArea.height / nZones,
+      z: 0,
+    },
+    onLane: LANE_3,
+  },
+];
 
-if (config.grid) {
-  const gridHelper = new THREE.GridHelper(80, 8);
-  gridHelper.rotation.x = Math.PI / 2;
-  scene.add(gridHelper);
-}
+const addCar = (scene, config) => {
+  const car = Car(config);
+  scene.add(car);
+  return car;
+};
+
+const cars = carsConfig.map((config) => {
+  const car = addCar(scene, config);
+  return car;
+});
+
+// if (config.grid) {
+//   const gridHelper = new THREE.GridHelper(80, 8);
+//   gridHelper.rotation.x = Math.PI / 2;
+//   scene.add(gridHelper);
+// }
 
 // Set up renderer
 const renderer = new THREE.WebGLRenderer({
@@ -70,36 +130,15 @@ document.body.appendChild(renderer.domElement);
 reset();
 
 function reset() {
-  // Reset position and score
-  // playerAngleMoved = 0;
-
-  // Remove other vehicles
-  otherVehicles.forEach((vehicle) => {
-    // Remove the vehicle from the scene
-    scene.remove(vehicle.mesh);
-
-    // If it has hit-zone helpers then remove them as well
-    if (vehicle.mesh.userData.hitZone1)
-      scene.remove(vehicle.mesh.userData.hitZone1);
-    if (vehicle.mesh.userData.hitZone2)
-      scene.remove(vehicle.mesh.userData.hitZone2);
-    if (vehicle.mesh.userData.hitZone3)
-      scene.remove(vehicle.mesh.userData.hitZone3);
-  });
-  otherVehicles = [];
-
   lastTimestamp = undefined;
-
-  // Place the player's car to the starting position
-  // movePlayerCar(0);
 
   // Render the scene
   renderer.render(scene, camera);
-
   ready = true;
 }
 
 startGame();
+
 function startGame() {
   if (ready) {
     ready = false;
@@ -110,7 +149,6 @@ function startGame() {
 let startTimestamp = 0;
 let resumeTimestamp = 0;
 let pauseTimestamp = 0;
-let pause = false;
 let resume = false;
 
 function animation(originalTimestamp) {
@@ -137,7 +175,10 @@ function animation(originalTimestamp) {
     return;
   }
   const timeDelta = timestamp - lastTimestamp;
-  move(playerCar, timestamp, timeDelta);
+
+  cars.forEach((car) => {
+    move(car, timestamp, timeDelta);
+  });
 
   renderer.render(scene, camera);
   lastTimestamp = timestamp;
