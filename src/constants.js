@@ -22,6 +22,11 @@ const LANE_2 = 'lane_2';
 const LANE_3 = 'lane_3';
 const LANE_4 = 'lane_4';
 
+// car
+const CAR_WIDTH = 30;
+const CAR_LENGTH = 60;
+const CAR_HEIGHT = 15;
+
 export {
   nZones,
   FRAME_TIME,
@@ -42,4 +47,7 @@ export {
   LANE_2,
   LANE_3,
   LANE_4,
+  CAR_HEIGHT,
+  CAR_WIDTH,
+  CAR_LENGTH,
 };

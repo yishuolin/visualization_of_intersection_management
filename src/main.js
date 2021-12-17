@@ -11,6 +11,8 @@ import {
   LANE_2,
   LANE_3,
   LANE_4,
+  CAR_LENGTH,
+  CAR_WIDTH,
 } from './constants';
 
 // The Pythagorean theorem says that the distance between two points is
@@ -51,7 +53,7 @@ const carsConfig = [
     ],
     position: {
       // TODO: should be more responsive to handle nZones changes
-      x: -window.intersectionArea.width / nZones,
+      x: -window.intersectionArea.width / nZones - CAR_LENGTH / 2,
       y: -window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_1,
@@ -64,7 +66,7 @@ const carsConfig = [
     ],
     position: {
       // TODO: should be more responsive to handle nZones changes
-      x: window.intersectionArea.width / nZones,
+      x: window.intersectionArea.width / nZones + CAR_LENGTH / 2,
       y: window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_2,
@@ -79,7 +81,7 @@ const carsConfig = [
     position: {
       // TODO: should be more responsive to handle nZones changes
       x: window.intersectionArea.width / nZones / 2,
-      y: -window.intersectionArea.height / nZones,
+      y: -window.intersectionArea.height / nZones - CAR_LENGTH / 2,
     },
     onLane: LANE_4,
   },
@@ -94,7 +96,7 @@ const carsConfig = [
     position: {
       // TODO: should be more responsive to handle nZones changes
       x: -window.intersectionArea.width / nZones / 2,
-      y: window.intersectionArea.height / nZones,
+      y: window.intersectionArea.height / nZones + CAR_LENGTH / 2,
       z: 0,
     },
     onLane: LANE_3,

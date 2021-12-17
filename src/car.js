@@ -7,6 +7,9 @@ import {
   LANE_2,
   LANE_3,
   LANE_4,
+  CAR_HEIGHT,
+  CAR_WIDTH,
+  CAR_LENGTH,
 } from './constants';
 
 const getStartTrajectory = {
@@ -36,7 +39,7 @@ function Car(config) {
   const color = 0xa52523;
 
   const main = new THREE.Mesh(
-    new THREE.BoxBufferGeometry(60, 30, 15),
+    new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
     // new THREE.BoxBufferGeometry(30, 30, 15),
     new THREE.MeshLambertMaterial({color}),
   );
