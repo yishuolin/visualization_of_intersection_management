@@ -1,7 +1,16 @@
-import {FRAME_TIME, START, END, LEFT, RIGHT, UP, DOWN} from './constants';
-
-const playerAngleInitial = Math.PI;
-let playerAngleMoved = 0;
+import {
+  FRAME_TIME,
+  START,
+  END,
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN,
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+} from './constants';
 
 const getPlayerSpeed = () => {
   return window.gridWidth / FRAME_TIME;
@@ -15,7 +24,7 @@ const move = (car, timestamp, timeDelta) => {
     numOfFrame < car.zones.length - 1 ? car.zones[numOfFrame + 1] : END;
 
   if (fromZone === START) {
-    if (toZone.x === atZone.x || toZone.y === atZone.y) {
+    if (toZone.x === atZone.x && toZone.y === atZone.y) {
       return;
     }
     moveCarByLane(car, timestamp, timeDelta);
@@ -34,24 +43,37 @@ const move = (car, timestamp, timeDelta) => {
   } else if (car.prevTrajectory === DOWN && toZone.y < atZone.y) {
     moveDown(car, timeDelta);
   } else if (car.prevTrajectory === RIGHT && toZone.y > atZone.y) {
-    car.onLane = 4;
+    car.onLane = LANE_4;
     if (!car.hasTurned) {
       car.hasTurned = true;
-      car.startTurnLeft = car.position.x;
       car.radius = Math.abs(car.position.y);
     }
     turnLeft(car, timeDelta);
-  } else {
-    console.log('stop');
+  } else if (car.prevTrajectory === DOWN && toZone.x > atZone.x) {
+    // TODO: refactor onLane
+    car.onLane = LANE_1;
+    if (!car.hasTurned) {
+      car.hasTurned = true;
+      car.radius = Math.abs(car.position.x);
+    }
+    turnLeft(car, timeDelta);
+  } else if (car.prevTrajectory === UP && toZone.x < atZone.x) {
+    // TODO: refactor onLane
+    car.onLane = LANE_2;
+    if (!car.hasTurned) {
+      car.hasTurned = true;
+      car.radius = Math.abs(car.position.x);
+    }
+    turnLeft(car, timeDelta);
   }
 };
 
 const moveCarByLane = (car, timestamp, timeDelta) => {
   const laneSwitch = {
-    1: moveRight,
-    2: moveLeft,
-    3: moveDown,
-    4: moveUp,
+    [LANE_1]: moveRight,
+    [LANE_2]: moveLeft,
+    [LANE_3]: moveDown,
+    [LANE_4]: moveUp,
   };
   laneSwitch[car.onLane](car, timeDelta);
 };
@@ -76,12 +98,15 @@ const moveDown = (car, timeDelta) => {
   car.position.y -= playerSpeed * timeDelta;
 };
 
+const center = window.gridWidth / 2;
+
 const turnLeft = (car, timeDelta) => {
   const angleDelta = (Math.PI / 2 / FRAME_TIME) * timeDelta;
-  playerAngleMoved -= angleDelta;
-  const totalPlayerAngle = playerAngleInitial + playerAngleMoved;
-  const playerX = Math.sin(totalPlayerAngle) * car.radius + car.startTurnLeft;
-  const playerY = Math.cos(totalPlayerAngle) * car.radius;
+  car.playerAngleMoved += angleDelta;
+  const totalPlayerAngle = car.playerAngleInitial + car.playerAngleMoved;
+
+  const playerX = Math.cos(totalPlayerAngle) * car.radius;
+  const playerY = Math.sin(totalPlayerAngle) * car.radius;
 
   car.position.x = playerX;
   car.position.y = playerY;
@@ -90,8 +115,8 @@ const turnLeft = (car, timeDelta) => {
 };
 const turnRight = (car, timeDelta) => {
   const angleDelta = (Math.PI / 2 / FRAME_TIME) * timeDelta;
-  playerAngleMoved += angleDelta;
-  const totalPlayerAngle = playerAngleInitial + playerAngleMoved;
+  car.playerAngleMoved += angleDelta;
+  const totalPlayerAngle = car.playerAngleInitial + car.playerAngleMoved;
   const playerX =
     Math.sin(totalPlayerAngle) * car.radius + playerCar.startTurnLeft;
   const playerY = Math.cos(totalPlayerAngle) * car.radius;
