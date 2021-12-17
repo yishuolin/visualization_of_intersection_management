@@ -130,36 +130,15 @@ document.body.appendChild(renderer.domElement);
 reset();
 
 function reset() {
-  // Reset position and score
-  // playerAngleMoved = 0;
-
-  // Remove other vehicles
-  otherVehicles.forEach((vehicle) => {
-    // Remove the vehicle from the scene
-    scene.remove(vehicle.mesh);
-
-    // If it has hit-zone helpers then remove them as well
-    if (vehicle.mesh.userData.hitZone1)
-      scene.remove(vehicle.mesh.userData.hitZone1);
-    if (vehicle.mesh.userData.hitZone2)
-      scene.remove(vehicle.mesh.userData.hitZone2);
-    if (vehicle.mesh.userData.hitZone3)
-      scene.remove(vehicle.mesh.userData.hitZone3);
-  });
-  otherVehicles = [];
-
   lastTimestamp = undefined;
-
-  // Place the player's car to the starting position
-  // movePlayerCar(0);
 
   // Render the scene
   renderer.render(scene, camera);
-
   ready = true;
 }
 
 startGame();
+
 function startGame() {
   if (ready) {
     ready = false;

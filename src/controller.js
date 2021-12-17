@@ -16,6 +16,25 @@ const getPlayerSpeed = () => {
   return window.gridWidth / FRAME_TIME;
 };
 
+const getNextLane = (currentLane, turn) => {
+  switch (currentLane) {
+    case LANE_1:
+      return turn === LEFT ? LANE_4 : LANE_3;
+    case LANE_2:
+      return turn === LEFT ? LANE_3 : LANE_4;
+    case LANE_3:
+      return turn === LEFT ? LANE_1 : LANE_2;
+    case LANE_4:
+      return turn === LEFT ? LANE_2 : LANE_1;
+  }
+};
+
+const getRadius = (position, prevTrajectory) => {
+  return prevTrajectory === UP || prevTrajectory === DOWN
+    ? Math.abs(position.x)
+    : Math.abs(position.y);
+};
+
 const move = (car, timestamp, timeDelta) => {
   const numOfFrame = Math.floor(timestamp / FRAME_TIME);
   const fromZone = numOfFrame > 0 ? car.zones[numOfFrame - 1] : START;
@@ -27,10 +46,10 @@ const move = (car, timestamp, timeDelta) => {
     if (toZone.x === atZone.x && toZone.y === atZone.y) {
       return;
     }
-    moveCarByLane(car, timestamp, timeDelta);
+    moveCarByLane(car, timeDelta);
     return;
   } else if (toZone === END) {
-    moveCarByLane(car, timestamp, timeDelta);
+    moveCarByLane(car, timeDelta);
     return;
   }
 
@@ -42,33 +61,22 @@ const move = (car, timestamp, timeDelta) => {
     moveUp(car, timeDelta);
   } else if (car.prevTrajectory === DOWN && toZone.y < atZone.y) {
     moveDown(car, timeDelta);
-  } else if (car.prevTrajectory === RIGHT && toZone.y > atZone.y) {
-    car.onLane = LANE_4;
+  } else if (
+    (car.prevTrajectory === RIGHT && toZone.y > atZone.y) ||
+    (car.prevTrajectory === LEFT && toZone.y < atZone.y) ||
+    (car.prevTrajectory === DOWN && toZone.x > atZone.x) ||
+    (car.prevTrajectory === UP && toZone.x < atZone.x)
+  ) {
     if (!car.hasTurned) {
+      car.onLane = getNextLane(car.onLane, LEFT);
       car.hasTurned = true;
-      car.radius = Math.abs(car.position.y);
-    }
-    turnLeft(car, timeDelta);
-  } else if (car.prevTrajectory === DOWN && toZone.x > atZone.x) {
-    // TODO: refactor onLane
-    car.onLane = LANE_1;
-    if (!car.hasTurned) {
-      car.hasTurned = true;
-      car.radius = Math.abs(car.position.x);
-    }
-    turnLeft(car, timeDelta);
-  } else if (car.prevTrajectory === UP && toZone.x < atZone.x) {
-    // TODO: refactor onLane
-    car.onLane = LANE_2;
-    if (!car.hasTurned) {
-      car.hasTurned = true;
-      car.radius = Math.abs(car.position.x);
+      car.radius = getRadius(car.position, car.prevTrajectory);
     }
     turnLeft(car, timeDelta);
   }
 };
 
-const moveCarByLane = (car, timestamp, timeDelta) => {
+const moveCarByLane = (car, timeDelta) => {
   const laneSwitch = {
     [LANE_1]: moveRight,
     [LANE_2]: moveLeft,
@@ -79,26 +87,20 @@ const moveCarByLane = (car, timestamp, timeDelta) => {
 };
 
 const moveRight = (car, timeDelta) => {
-  const playerSpeed = getPlayerSpeed();
-  car.position.x += playerSpeed * timeDelta;
+  car.position.x += getPlayerSpeed() * timeDelta;
 };
 
 const moveLeft = (car, timeDelta) => {
-  const playerSpeed = getPlayerSpeed();
-  car.position.x -= playerSpeed * timeDelta;
+  car.position.x -= getPlayerSpeed() * timeDelta;
 };
 
 const moveUp = (car, timeDelta) => {
-  const playerSpeed = getPlayerSpeed();
-  car.position.y += playerSpeed * timeDelta;
+  car.position.y += getPlayerSpeed() * timeDelta;
 };
 
 const moveDown = (car, timeDelta) => {
-  const playerSpeed = getPlayerSpeed();
-  car.position.y -= playerSpeed * timeDelta;
+  car.position.y -= getPlayerSpeed() * timeDelta;
 };
-
-const center = window.gridWidth / 2;
 
 const turnLeft = (car, timeDelta) => {
   const angleDelta = (Math.PI / 2 / FRAME_TIME) * timeDelta;
