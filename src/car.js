@@ -1,10 +1,46 @@
+import {
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN,
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+  CAR_HEIGHT,
+  CAR_WIDTH,
+  CAR_LENGTH,
+} from './constants';
+
+const getStartTrajectory = {
+  [LANE_1]: RIGHT,
+  [LANE_2]: LEFT,
+  [LANE_3]: DOWN,
+  [LANE_4]: UP,
+};
+
+const getPlayerAngleInitial = {
+  [LANE_1]: (Math.PI / 2) * 3,
+  [LANE_2]: Math.PI / 2,
+  [LANE_3]: Math.PI,
+  [LANE_4]: 0,
+};
+
+const getRotationZ = {
+  [LANE_1]: 0,
+  [LANE_2]: Math.PI,
+  [LANE_3]: (Math.PI / 2) * 3,
+  [LANE_4]: Math.PI / 2,
+};
+
 function Car(config) {
   const car = new THREE.Group();
 
   const color = 0xa52523;
 
   const main = new THREE.Mesh(
-    new THREE.BoxBufferGeometry(15, 15, 15), // original: new THREE.BoxBufferGeometry(60, 30, 15),
+    new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
+    // new THREE.BoxBufferGeometry(30, 30, 15),
     new THREE.MeshLambertMaterial({color}),
   );
   main.position.z = 12;
@@ -12,46 +48,20 @@ function Car(config) {
   main.receiveShadow = true;
   car.add(main);
 
-  // const windowColor = 0xffffff;
-  // const cabin = new THREE.Mesh(new THREE.BoxBufferGeometry(33, 24, 12), [
-  //   new THREE.MeshLambertMaterial({color: windowColor}),
-  //   new THREE.MeshLambertMaterial({color: windowColor}),
-  //   new THREE.MeshLambertMaterial({color: windowColor}),
-  //   new THREE.MeshLambertMaterial({color: windowColor}),
-  //   new THREE.MeshLambertMaterial({color: 0xffffff}), // top
-  //   new THREE.MeshLambertMaterial({color: 0xffffff}), // bottom
-  // ]);
-  // cabin.position.x = -6;
-  // cabin.position.z = 25.5;
-  // cabin.castShadow = true;
-  // cabin.receiveShadow = true;
-  // car.add(cabin);
+  car.zones = config.zones;
+  car.position.x = config.position.x;
+  car.position.y = config.position.y;
+  car.onLane = config.onLane;
+  car.prevTrajectory = getStartTrajectory[config.onLane];
+  car.rotation.z = getRotationZ[config.onLane];
+  // turn
+  car.hasTurned = false;
+  car.radius = 0;
+  car.playerAngleMoved = 0;
+  car.playerAngleInitial = getPlayerAngleInitial[config.onLane];
 
-  // const backWheel = new Wheel();
-  // backWheel.position.x = -18;
-  // car.add(backWheel);
-
-  // const frontWheel = new Wheel();
-  // frontWheel.position.x = 18;
-  // car.add(frontWheel);
-
-  if (config.showHitZones) {
-    // TODO: HitZone is nod defined
-    car.userData.hitZone1 = HitZone();
-    car.userData.hitZone2 = HitZone();
-  }
-
+  car.mesh = main;
   return car;
-}
-
-function Wheel() {
-  const wheelGeometry = new THREE.BoxBufferGeometry(12, 33, 12);
-  const wheelMaterial = new THREE.MeshLambertMaterial({color: 0x333333});
-  const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-  wheel.position.z = 6;
-  wheel.castShadow = false;
-  wheel.receiveShadow = false;
-  return wheel;
 }
 
 export {Car};

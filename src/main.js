@@ -2,7 +2,18 @@ import {ambientLight, dirLight} from './light';
 import {camera, cameraWidth, cameraHeight} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
-window.focus(); // Capture keys right away (by default focus is on editor)
+import {move} from './controller';
+import {
+  nZones,
+  FRAME_TIME,
+  ANIMATION_TIME,
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+  CAR_LENGTH,
+  CAR_WIDTH,
+} from './constants';
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -14,54 +25,100 @@ function getDistance(coordinate1, coordinate2) {
 
 const config = {
   showHitZones: false,
-  shadows: true, // Use shadow
-  trees: true, // Add trees to the map
-  curbs: true, // Show texture on the extruded geometry
+  shadows: false, // Use shadow
+  trees: false, // Add trees to the map
+  curbs: false, // Show texture on the extruded geometry
   grid: false, // Show grid helper
 };
-
-let score;
-const speed = 0.0017;
-
-const playerAngleInitial = Math.PI;
-let playerAngleMoved;
 
 let otherVehicles = [];
 let ready;
 let lastTimestamp;
 
-const trackRadius = 225;
-const trackWidth = 45;
-const innerTrackRadius = trackRadius - trackWidth;
-const outerTrackRadius = trackRadius + trackWidth;
-
-const arcAngle1 = (1 / 3) * Math.PI; // 60 degrees
-
-const deltaY = Math.sin(arcAngle1) * innerTrackRadius;
-const arcAngle2 = Math.asin(deltaY / outerTrackRadius);
-
-const arcCenterX =
-  (Math.cos(arcAngle1) * innerTrackRadius +
-    Math.cos(arcAngle2) * outerTrackRadius) /
-  2;
-
 const scene = new THREE.Scene();
 
-const playerCar = Car(config);
-scene.add(playerCar);
-
-const nZones = 4; // form nZones * nZones grid
-scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // The map height is higher because we look at the map from an angle
+// scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
+scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
 scene.add(ambientLight);
 scene.add(dirLight);
-// const cameraHelper = new THREE.CameraHelper(dirLight.shadow.camera);
-// scene.add(cameraHelper);
 
-if (config.grid) {
-  const gridHelper = new THREE.GridHelper(80, 8);
-  gridHelper.rotation.x = Math.PI / 2;
-  scene.add(gridHelper);
-}
+const carsConfig = [
+  {
+    zones: [
+      {x: 0, y: 0},
+      {x: 0, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: -window.intersectionArea.width / nZones - CAR_LENGTH / 2,
+      y: -window.intersectionArea.height / nZones / 2,
+    },
+    onLane: LANE_1,
+  },
+  {
+    zones: [
+      {x: 1, y: 1},
+      {x: 0, y: 1},
+      {x: 0, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: window.intersectionArea.width / nZones + CAR_LENGTH / 2,
+      y: window.intersectionArea.height / nZones / 2,
+    },
+    onLane: LANE_2,
+  },
+  {
+    zones: [
+      {x: 1, y: 0},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+      {x: 0, y: 1},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: window.intersectionArea.width / nZones / 2,
+      y: -window.intersectionArea.height / nZones - CAR_LENGTH / 2,
+    },
+    onLane: LANE_4,
+  },
+  {
+    zones: [
+      {x: 0, y: 1},
+      {x: 0, y: 1},
+      {x: 0, y: 0},
+      {x: 0, y: 0},
+      {x: 1, y: 0},
+    ],
+    position: {
+      // TODO: should be more responsive to handle nZones changes
+      x: -window.intersectionArea.width / nZones / 2,
+      y: window.intersectionArea.height / nZones + CAR_LENGTH / 2,
+      z: 0,
+    },
+    onLane: LANE_3,
+  },
+];
+
+const addCar = (scene, config) => {
+  const car = Car(config);
+  scene.add(car);
+  return car;
+};
+
+const cars = carsConfig.map((config) => {
+  const car = addCar(scene, config);
+  return car;
+});
+
+// if (config.grid) {
+//   const gridHelper = new THREE.GridHelper(80, 8);
+//   gridHelper.rotation.x = Math.PI / 2;
+//   scene.add(gridHelper);
+// }
 
 // Set up renderer
 const renderer = new THREE.WebGLRenderer({
@@ -75,268 +132,120 @@ document.body.appendChild(renderer.domElement);
 reset();
 
 function reset() {
-  // Reset position and score
-  playerAngleMoved = 0;
-  score = 0;
-  // scoreElement.innerText = "Press UP";
-
-  // Remove other vehicles
-  otherVehicles.forEach((vehicle) => {
-    // Remove the vehicle from the scene
-    scene.remove(vehicle.mesh);
-
-    // If it has hit-zone helpers then remove them as well
-    if (vehicle.mesh.userData.hitZone1)
-      scene.remove(vehicle.mesh.userData.hitZone1);
-    if (vehicle.mesh.userData.hitZone2)
-      scene.remove(vehicle.mesh.userData.hitZone2);
-    if (vehicle.mesh.userData.hitZone3)
-      scene.remove(vehicle.mesh.userData.hitZone3);
-  });
-  otherVehicles = [];
-
-  // resultsElement.style.display = "none";
-
   lastTimestamp = undefined;
-
-  // Place the player's car to the starting position
-  // movePlayerCar(0);
 
   // Render the scene
   renderer.render(scene, camera);
-
   ready = true;
 }
+
+startGame();
 
 function startGame() {
   if (ready) {
     ready = false;
-    // scoreElement.innerText = 0;
-    // buttonsElement.style.opacity = 1;
-    // instructionsElement.style.opacity = 0;
-    // youtubeLogo.style.opacity = 1;
     renderer.setAnimationLoop(animation);
   }
 }
 
-function animation(timestamp) {
+let startTimestamp = 0;
+let resumeTimestamp = 0;
+let pauseTimestamp = 0;
+let resume = false;
+
+function animation(originalTimestamp) {
+  const timestamp = pauseTimestamp + originalTimestamp - resumeTimestamp;
+
+  if (resume) {
+    resumeTimestamp = originalTimestamp;
+    resume = false;
+    return;
+  }
+
+  // init lastTimestamp
   if (!lastTimestamp) {
     lastTimestamp = timestamp;
     return;
   }
-
+  // end of game
+  if (startTimestamp >= ANIMATION_TIME) {
+    return;
+  }
+  // end of one frame
+  if (timestamp - startTimestamp >= FRAME_TIME) {
+    startTimestamp = timestamp;
+    return;
+  }
   const timeDelta = timestamp - lastTimestamp;
 
-  movePlayerCar(timeDelta);
-
-  const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
-
-  // Update score if it changed
-  if (laps != score) {
-    score = laps;
-    // scoreElement.innerText = score;
-  }
-
-  // Add a new vehicle at the beginning and with every 5th lap
-  if (otherVehicles.length < (laps + 1) / 5) addVehicle();
-
-  moveOtherVehicles(timeDelta);
-
-  hitDetection();
+  cars.forEach((car) => {
+    move(car, timestamp, timeDelta);
+  });
 
   renderer.render(scene, camera);
   lastTimestamp = timestamp;
-}
 
-function movePlayerCar(timeDelta) {
-  const playerSpeed = getPlayerSpeed();
-  playerAngleMoved -= playerSpeed * timeDelta;
-
-  const totalPlayerAngle = playerAngleInitial + playerAngleMoved;
-
-  const playerX = Math.cos(totalPlayerAngle) * trackRadius - arcCenterX;
-  const playerY = Math.sin(totalPlayerAngle) * trackRadius;
-
-  playerCar.position.x = playerX;
-  playerCar.position.y = playerY;
-
-  playerCar.rotation.z = totalPlayerAngle - Math.PI / 2;
-}
-
-function moveOtherVehicles(timeDelta) {
-  otherVehicles.forEach((vehicle) => {
-    if (vehicle.clockwise) {
-      vehicle.angle -= speed * timeDelta * vehicle.speed;
-    } else {
-      vehicle.angle += speed * timeDelta * vehicle.speed;
-    }
-
-    const vehicleX = Math.cos(vehicle.angle) * trackRadius + arcCenterX;
-    const vehicleY = Math.sin(vehicle.angle) * trackRadius;
-    const rotation =
-      vehicle.angle + (vehicle.clockwise ? -Math.PI / 2 : Math.PI / 2);
-    vehicle.mesh.position.x = vehicleX;
-    vehicle.mesh.position.y = vehicleY;
-    vehicle.mesh.rotation.z = rotation;
+  // TODO: need refactor
+  document.getElementById('stop').addEventListener('click', () => {
+    pauseTimestamp = timestamp;
+    renderer.setAnimationLoop(null);
+  });
+  document.getElementById('resume').addEventListener('click', () => {
+    resume = true;
+    renderer.setAnimationLoop(animation);
   });
 }
 
-function getPlayerSpeed() {
-  return speed;
-}
+/*
+// Another Animation System
+// https://blog.csdn.net/ithanmang/article/details/84062933
+// https://stackoverflow.com/questions/40434314/threejs-animationclip-example-needed
 
-function addVehicle() {
-  const vehicleTypes = ['car', 'truck'];
+// POSITION
+playerCar.name = 'playerCar';
+const positionKF = new THREE.KeyframeTrack(
+  'playerCar.position',
+  [0, 2],
+  [0, 0, 0, 100, 100, 0],
+);
 
-  const type = pickRandom(vehicleTypes);
-  const speed = getVehicleSpeed(type);
-  const clockwise = Math.random() >= 0.5;
+// ROTATION
+// set up rotation about x axis
+const zAxis = new THREE.Vector3(0, 0, 1);
 
-  const angle = clockwise ? Math.PI / 2 : -Math.PI / 2;
+var qInitial = new THREE.Quaternion().setFromAxisAngle(zAxis, 0);
+var qFinal = new THREE.Quaternion().setFromAxisAngle(zAxis, Math.PI / 2);
+var quaternionKF = new THREE.QuaternionKeyframeTrack(
+  '.quaternion',
+  [0, 1],
+  [
+    qInitial.x,
+    qInitial.y,
+    qInitial.z,
+    qInitial.w,
+    qFinal.x,
+    qFinal.y,
+    qFinal.z,
+    qFinal.w,
+  ],
+);
 
-  const mesh = type == 'car' ? Car(config) : Truck();
-  scene.add(mesh);
+// create an animation sequence with the tracks
+// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
+const clip = new THREE.AnimationClip('action', 2, [positionKF, quaternionKF]);
 
-  otherVehicles.push({mesh, type, speed, clockwise, angle});
-}
+// setup the AnimationMixer
+const mixer = new THREE.AnimationMixer(playerCar);
 
-function getVehicleSpeed(type) {
-  if (type == 'car') {
-    const minimumSpeed = 1;
-    const maximumSpeed = 2;
-    return minimumSpeed + Math.random() * (maximumSpeed - minimumSpeed);
-  }
-  if (type == 'truck') {
-    const minimumSpeed = 0.6;
-    const maximumSpeed = 1.5;
-    return minimumSpeed + Math.random() * (maximumSpeed - minimumSpeed);
-  }
-}
+// create a ClipAction and set it to play
+const clipAction = mixer.clipAction(clip);
+clipAction.setLoop(THREE.LoopOnce).play();
 
-function getHitZonePosition(center, angle, clockwise, distance) {
-  const directionAngle = angle + clockwise ? -Math.PI / 2 : +Math.PI / 2;
-  return {
-    x: center.x + Math.cos(directionAngle) * distance,
-    y: center.y + Math.sin(directionAngle) * distance,
-  };
-}
-
-function hitDetection() {
-  const playerHitZone1 = getHitZonePosition(
-    playerCar.position,
-    playerAngleInitial + playerAngleMoved,
-    true,
-    15,
-  );
-
-  const playerHitZone2 = getHitZonePosition(
-    playerCar.position,
-    playerAngleInitial + playerAngleMoved,
-    true,
-    -15,
-  );
-
-  if (config.showHitZones) {
-    playerCar.userData.hitZone1.position.x = playerHitZone1.x;
-    playerCar.userData.hitZone1.position.y = playerHitZone1.y;
-
-    playerCar.userData.hitZone2.position.x = playerHitZone2.x;
-    playerCar.userData.hitZone2.position.y = playerHitZone2.y;
-  }
-
-  const hit = otherVehicles.some((vehicle) => {
-    if (vehicle.type == 'car') {
-      const vehicleHitZone1 = getHitZonePosition(
-        vehicle.mesh.position,
-        vehicle.angle,
-        vehicle.clockwise,
-        15,
-      );
-
-      const vehicleHitZone2 = getHitZonePosition(
-        vehicle.mesh.position,
-        vehicle.angle,
-        vehicle.clockwise,
-        -15,
-      );
-
-      if (config.showHitZones) {
-        vehicle.mesh.userData.hitZone1.position.x = vehicleHitZone1.x;
-        vehicle.mesh.userData.hitZone1.position.y = vehicleHitZone1.y;
-
-        vehicle.mesh.userData.hitZone2.position.x = vehicleHitZone2.x;
-        vehicle.mesh.userData.hitZone2.position.y = vehicleHitZone2.y;
-      }
-
-      // The player hits another vehicle
-      if (getDistance(playerHitZone1, vehicleHitZone1) < 40) return true;
-      if (getDistance(playerHitZone1, vehicleHitZone2) < 40) return true;
-
-      // Another vehicle hits the player
-      if (getDistance(playerHitZone2, vehicleHitZone1) < 40) return true;
-    }
-
-    if (vehicle.type == 'truck') {
-      const vehicleHitZone1 = getHitZonePosition(
-        vehicle.mesh.position,
-        vehicle.angle,
-        vehicle.clockwise,
-        35,
-      );
-
-      const vehicleHitZone2 = getHitZonePosition(
-        vehicle.mesh.position,
-        vehicle.angle,
-        vehicle.clockwise,
-        0,
-      );
-
-      const vehicleHitZone3 = getHitZonePosition(
-        vehicle.mesh.position,
-        vehicle.angle,
-        vehicle.clockwise,
-        -35,
-      );
-
-      if (config.showHitZones) {
-        vehicle.mesh.userData.hitZone1.position.x = vehicleHitZone1.x;
-        vehicle.mesh.userData.hitZone1.position.y = vehicleHitZone1.y;
-
-        vehicle.mesh.userData.hitZone2.position.x = vehicleHitZone2.x;
-        vehicle.mesh.userData.hitZone2.position.y = vehicleHitZone2.y;
-
-        vehicle.mesh.userData.hitZone3.position.x = vehicleHitZone3.x;
-        vehicle.mesh.userData.hitZone3.position.y = vehicleHitZone3.y;
-      }
-
-      // The player hits another vehicle
-      if (getDistance(playerHitZone1, vehicleHitZone1) < 40) return true;
-      if (getDistance(playerHitZone1, vehicleHitZone2) < 40) return true;
-      if (getDistance(playerHitZone1, vehicleHitZone3) < 40) return true;
-
-      // Another vehicle hits the player
-      if (getDistance(playerHitZone2, vehicleHitZone1) < 40) return true;
-    }
-  });
-
-  if (hit) {
-    // if (resultsElement) resultsElement.style.display = "flex";
-    renderer.setAnimationLoop(null); // Stop animation loop
-  }
-}
-
-window.addEventListener('resize', () => {
-  console.log('resize', window.innerWidth, window.innerHeight);
-
-  // Adjust camera
-  const newAspectRatio = window.innerWidth / window.innerHeight;
-  const adjustedCameraHeight = cameraWidth / newAspectRatio;
-
-  camera.top = adjustedCameraHeight / 2;
-  camera.bottom = adjustedCameraHeight / -2;
-  camera.updateProjectionMatrix(); // Must be called after change
-
-  // Reset renderer
-  renderer.setSize(window.innerWidth, window.innerHeight);
+const clock = new THREE.Clock();
+const _animate = () => {
+  requestAnimationFrame(_animate);
   renderer.render(scene, camera);
-});
+  mixer.update(clock.getDelta());
+};
+_animate();
+*/

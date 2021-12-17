@@ -1,6 +1,11 @@
-const TRACK_COLOR = '#546E90';
-const LINE_WIDTH = 2;
-const INTERSECTION_AREA_SIZE = 0.5;
+import {
+  TRACK_COLOR,
+  BARRIER_LINE_COLOR,
+  ZONE_LINE_COLOR,
+  BARRIER_LINE_WIDTH,
+  ZONE_LINE_WIDTH,
+  INTERSECTION_AREA_SIZE,
+} from './constants';
 
 function getRoad(mapWidth, mapHeight, nZones) {
   const lineMarkingsTexture = getLineMarkings(
@@ -42,8 +47,8 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
   context.fillStyle = TRACK_COLOR;
   context.fillRect(0, 0, mapWidth, mapHeight);
 
-  context.lineWidth = LINE_WIDTH;
-  context.strokeStyle = '#E0FFFF';
+  context.lineWidth = BARRIER_LINE_WIDTH;
+  context.strokeStyle = BARRIER_LINE_COLOR;
   context.setLineDash([10, 14]);
 
   // vertical line
@@ -63,11 +68,18 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
   context.stroke();
 
   // draw conflict zones
-  context.lineWidth = LINE_WIDTH;
-  context.strokeStyle = '#000000';
+  context.lineWidth = ZONE_LINE_WIDTH;
+  context.strokeStyle = ZONE_LINE_COLOR;
   context.setLineDash([]);
   const gridWidth = intersectionArea.width / nZones;
   const gridHeight = intersectionArea.height / nZones;
+
+  // TODO: need refactor
+  window.gridWidth = gridWidth;
+  window.gridHeight = gridHeight;
+  window.intersectionAreaStart = intersectionAreaStart;
+  window.intersectionAreaEnd = intersectionAreaEnd;
+  window.intersectionArea = intersectionArea;
 
   for (let i = 0; i <= nZones; i++) {
     const offsetX = i * gridWidth;
