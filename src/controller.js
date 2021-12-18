@@ -35,8 +35,8 @@ const getRadius = (position, prevTrajectory) => {
     : Math.abs(position.y);
 };
 
-const move = (car, timestamp, timeDelta) => {
-  const numOfFrame = Math.floor(timestamp / FRAME_TIME);
+const move = (car, numOfFrame, timeDelta) => {
+  // const numOfFrame = Math.floor(timestamp / FRAME_TIME);
   const fromZone = numOfFrame > 0 ? car.zones[numOfFrame - 1] : START;
   const atZone = car.zones[numOfFrame];
   const toZone =

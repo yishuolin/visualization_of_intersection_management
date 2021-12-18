@@ -1,6 +1,7 @@
 const nZones = 2; // form nZones * nZones grid
 const FRAME_TIME = 1000;
 const ANIMATION_TIME = 5000;
+const FPS = 60;
 
 // controller
 const START = 'start';
@@ -31,6 +32,7 @@ export {
   nZones,
   FRAME_TIME,
   ANIMATION_TIME,
+  FPS,
   START,
   END,
   LEFT,

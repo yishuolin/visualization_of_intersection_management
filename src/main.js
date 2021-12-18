@@ -13,6 +13,7 @@ import {
   LANE_4,
   CAR_LENGTH,
   CAR_WIDTH,
+  FPS,
 } from './constants';
 
 // The Pythagorean theorem says that the distance between two points is
@@ -31,7 +32,6 @@ const config = {
   grid: false, // Show grid helper
 };
 
-let otherVehicles = [];
 let ready;
 let lastTimestamp;
 
@@ -144,15 +144,39 @@ startGame();
 function startGame() {
   if (ready) {
     ready = false;
-    renderer.setAnimationLoop(animation);
+    // renderer.setAnimationLoop(animation);
   }
 }
 
-let startTimestamp = 0;
-let resumeTimestamp = 0;
-let pauseTimestamp = 0;
-let resume = false;
+// let startTimestamp = 0;
+// let resumeTimestamp = 0;
+// let pauseTimestamp = 0;
+// let resume = false;
 
+let animationInterval = null;
+let counter = 0;
+let numOfFrame = 0;
+const TIME_DELTA = 1000 / FPS;
+
+document.getElementById('next').addEventListener('click', () => {
+  animationInterval = setInterval(_animation, TIME_DELTA);
+});
+function _animation() {
+  counter += TIME_DELTA;
+  if (counter > FRAME_TIME) {
+    counter = 0;
+    numOfFrame++;
+    clearInterval(animationInterval);
+  } else {
+    document.getElementById('step').innerHTML = `Step: ${numOfFrame + 1}`;
+    cars.forEach((car) => {
+      move(car, numOfFrame, TIME_DELTA);
+    });
+    renderer.render(scene, camera);
+  }
+}
+
+/*
 function animation(originalTimestamp) {
   const timestamp = pauseTimestamp + originalTimestamp - resumeTimestamp;
 
@@ -195,6 +219,7 @@ function animation(originalTimestamp) {
     renderer.setAnimationLoop(animation);
   });
 }
+*/
 
 /*
 // Another Animation System
