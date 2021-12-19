@@ -1,0 +1,57 @@
+node {
+    width: 50;
+    height: 50;
+    font-size: 12;
+    text-valign: center;
+    visibility: visible;
+    background-color: #ffe7b3;
+}
+
+edge {
+    width: 2;
+    target-arrow-shape: triangle;
+    curve-style: bezier;
+}
+
+.cy-node-current {
+    border-width: 4;
+    border-color: #ff8064;
+}
+
+.cy-edge-type1 {
+    line-color: #000000;
+    target-arrow-color: #000000;
+    line-style: solid;
+}
+
+.cy-edge-type2 {
+    line-color: #000000;
+    target-arrow-color: #000000;
+    line-style: dashed;
+    line-dash-pattern: 6, 2;
+
+
+}
+
+.cy-edge-type3 {
+    line-color: #000000;
+    target-arrow-color: #000000;
+    line-style: dashed;
+    line-dash-pattern: 2, 2;
+}
+
+.cy-disabled {
+    visibility: hidden;
+}
+
+.cy-selected {
+    background-color: #ffb88b;
+}
+
+.cy-transparent {
+    opacity: 0.5;
+}
+
+node[?inLane] {
+    background-color: #e8ffaf;
+}

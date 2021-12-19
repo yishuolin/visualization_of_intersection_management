@@ -15,6 +15,17 @@ import {
   CAR_WIDTH,
   FPS,
 } from './constants';
+import IntersectionSimulation from './intersection-management/intersection-simulation';
+
+window.IS = new IntersectionSimulation(4);
+document.getElementById('randCars').onclick = (e)=>window.IS.randomCars();
+document.getElementById('randSol').onclick = (e)=>window.IS.pickRandomSolution();
+document.getElementById('checkCycle').onclick = (e)=>console.log(window.IS.isCycleExist(true));
+document.getElementById('reset').onclick = (e)=>window.IS.reset();
+document.getElementById('showOnlyZones').onclick = (e)=>window.IS.showOnlyZones();
+document.getElementById('showFull').onclick = (e)=>window.IS.showFull();
+document.getElementById('stepNext').onclick = (e)=>window.IS.stepNext();
+document.getElementById('stepPrev').onclick = (e)=>window.IS.stepPrev();
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
