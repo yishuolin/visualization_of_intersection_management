@@ -46,7 +46,6 @@ const carsConfig = [
   {
     zones: [
       {x: 0, y: 0},
-      {x: 0, y: 0},
       {x: 1, y: 0},
       {x: 1, y: 0},
       {x: 1, y: 1},
@@ -61,6 +60,8 @@ const carsConfig = [
   {
     zones: [
       {x: 1, y: 1},
+      {x: 1, y: 1},
+      {x: 1, y: 1},
       {x: 0, y: 1},
       {x: 0, y: 1},
     ],
@@ -71,20 +72,20 @@ const carsConfig = [
     },
     onLane: LANE_2,
   },
-  {
-    zones: [
-      {x: 1, y: 0},
-      {x: 1, y: 0},
-      {x: 1, y: 1},
-      {x: 0, y: 1},
-    ],
-    position: {
-      // TODO: should be more responsive to handle nZones changes
-      x: window.intersectionArea.width / nZones / 2,
-      y: -window.intersectionArea.height / nZones - CAR_LENGTH / 2,
-    },
-    onLane: LANE_4,
-  },
+  // {
+  //   zones: [
+  //     {x: 1, y: 0},
+  //     {x: 1, y: 0},
+  //     {x: 1, y: 1},
+  //     {x: 0, y: 1},
+  //   ],
+  //   position: {
+  //     // TODO: should be more responsive to handle nZones changes
+  //     x: window.intersectionArea.width / nZones / 2,
+  //     y: -window.intersectionArea.height / nZones - CAR_LENGTH / 2,
+  //   },
+  //   onLane: LANE_4,
+  // },
   {
     zones: [
       {x: 0, y: 1},
@@ -97,7 +98,6 @@ const carsConfig = [
       // TODO: should be more responsive to handle nZones changes
       x: -window.intersectionArea.width / nZones / 2,
       y: window.intersectionArea.height / nZones + CAR_LENGTH / 2,
-      z: 0,
     },
     onLane: LANE_3,
   },

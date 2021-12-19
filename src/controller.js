@@ -10,6 +10,7 @@ import {
   LANE_2,
   LANE_3,
   LANE_4,
+  CAR_LENGTH,
 } from './constants';
 
 const getPlayerSpeed = () => {
