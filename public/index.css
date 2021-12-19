@@ -14,12 +14,14 @@ body {
 #graph {
   width: 50%;
   height: 100vh;
-  border: 3px solid black;
+  border-left: 3px solid black;
 }
 #cy,
 #resource-conflict-graph {
   height: 50vh;
-  border: 1px solid black;
+}
+#cy {
+  border-bottom: 2px solid black;
 }
 #buttons {
   position: fixed;
