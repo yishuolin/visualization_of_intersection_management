@@ -17,18 +17,16 @@ import {
 } from './constants';
 import IntersectionSimulation from './intersection-management/intersection-simulation';
 
-window.IS = new IntersectionSimulation(4);
-document.getElementById('randCars').onclick = (e) => window.IS.randomCars();
-document.getElementById('randSol').onclick = (e) =>
-  window.IS.pickRandomSolution();
+const IS = new IntersectionSimulation(4);
+document.getElementById('randCars').onclick = (e) => IS.randomCars();
+document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = (e) =>
-  console.log(window.IS.isCycleExist(true));
-document.getElementById('reset').onclick = (e) => window.IS.reset();
-document.getElementById('showOnlyZones').onclick = (e) =>
-  window.IS.showOnlyZones();
-document.getElementById('showFull').onclick = (e) => window.IS.showFull();
-document.getElementById('stepNext').onclick = (e) => window.IS.stepNext();
-document.getElementById('stepPrev').onclick = (e) => window.IS.stepPrev();
+  console.log(IS.isCycleExist(true));
+document.getElementById('reset').onclick = (e) => IS.reset();
+document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
+document.getElementById('showFull').onclick = (e) => IS.showFull();
+document.getElementById('stepNext').onclick = (e) => IS.stepNext();
+document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -73,7 +71,8 @@ const carsConfig = [
     ],
     position: {
       // TODO: should be more responsive to handle nZones changes
-      x: -window.intersectionArea.width / nZones - CAR_LENGTH / 2,
+      // x: -window.intersectionArea.width / nZones - CAR_LENGTH / 2,
+      x: -window.intersectionArea.width / nZones,
       y: -window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_1,
@@ -88,7 +87,7 @@ const carsConfig = [
     ],
     position: {
       // TODO: should be more responsive to handle nZones changes
-      x: window.intersectionArea.width / nZones + CAR_LENGTH / 2,
+      x: window.intersectionArea.width / nZones,
       y: window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_2,
@@ -118,7 +117,7 @@ const carsConfig = [
     position: {
       // TODO: should be more responsive to handle nZones changes
       x: -window.intersectionArea.width / nZones / 2,
-      y: window.intersectionArea.height / nZones + CAR_LENGTH / 2,
+      y: window.intersectionArea.height / nZones,
     },
     onLane: LANE_3,
   },

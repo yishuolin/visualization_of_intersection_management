@@ -40,13 +40,19 @@ function Car(config) {
 
   const main = new THREE.Mesh(
     new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
-    // new THREE.BoxBufferGeometry(30, 30, 15),
     new THREE.MeshLambertMaterial({color}),
   );
+  const transparentMesh = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
+    new THREE.MeshLambertMaterial({color, opacity: 0, transparent: true}),
+  );
+  main.position.x = -CAR_LENGTH / 2;
   main.position.z = 12;
   main.castShadow = true;
   main.receiveShadow = true;
+  transparentMesh.position.x = CAR_LENGTH / 2;
   car.add(main);
+  car.add(transparentMesh);
 
   car.zones = config.zones;
   car.position.x = config.position.x;
