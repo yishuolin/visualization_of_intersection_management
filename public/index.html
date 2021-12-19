@@ -7,25 +7,28 @@
 		</style>
 		<link rel="stylesheet" href="index.css">
 	</head>
-	<body style="margin: 0px; background-color: #546E90;">
+	<body>
 		<script src="three.js"></script>
-    <!-- <button id="stop">Stop</button>
-    <button id="resume">Resume</button> -->
-    <div style="position: fixed; top: 3;">
-      <button id="next">Next</button>
-      <span id="step" style="color: white; font-size: 16px;">Step: 0</span>
+    <div class="container">
+      <div id="intersection">
+        <button id="next">Next</button>
+        <span id="step">Step: 0</span>
+      </div>
+      <div id="graph">
+        <div id="cy">
+        </div>
+        <div id="resource-conflict-graph"></div>
+      </div>
     </div>
-	<div style="position: fixed; bottom: 0;">
-		<div id="cy">
-		</div>
-		<button id="randCars">Generate Random Cars</button>
-		<button id="randSol">Pick Random Solution</button>
-		<button id="checkCycle">Check Cycle</button>
-		<button id="reset">Reset</button>
-		<button id="showOnlyZones">Show Only Zones</button>
-		<button id="showFull">Show Full Graph</button>
-		<button id="stepNext">Step Next</button>
-		<button id="stepPrev">Step Prev</button>
-	</div>
+    <div id="buttons">
+      <button id="randCars">Generate Random Cars</button>
+      <button id="randSol">Pick Random Solution</button>
+      <button id="checkCycle">Check Cycle</button>
+      <button id="reset">Reset</button>
+      <button id="showOnlyZones">Show Only Zones</button>
+      <button id="showFull">Show Full Graph</button>
+      <button id="stepNext">Step Next</button>
+      <button id="stepPrev">Step Prev</button>
+    </div>
 	</body>
 </html>

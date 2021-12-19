@@ -18,14 +18,17 @@ import {
 import IntersectionSimulation from './intersection-management/intersection-simulation';
 
 window.IS = new IntersectionSimulation(4);
-document.getElementById('randCars').onclick = (e)=>window.IS.randomCars();
-document.getElementById('randSol').onclick = (e)=>window.IS.pickRandomSolution();
-document.getElementById('checkCycle').onclick = (e)=>console.log(window.IS.isCycleExist(true));
-document.getElementById('reset').onclick = (e)=>window.IS.reset();
-document.getElementById('showOnlyZones').onclick = (e)=>window.IS.showOnlyZones();
-document.getElementById('showFull').onclick = (e)=>window.IS.showFull();
-document.getElementById('stepNext').onclick = (e)=>window.IS.stepNext();
-document.getElementById('stepPrev').onclick = (e)=>window.IS.stepPrev();
+document.getElementById('randCars').onclick = (e) => window.IS.randomCars();
+document.getElementById('randSol').onclick = (e) =>
+  window.IS.pickRandomSolution();
+document.getElementById('checkCycle').onclick = (e) =>
+  console.log(window.IS.isCycleExist(true));
+document.getElementById('reset').onclick = (e) => window.IS.reset();
+document.getElementById('showOnlyZones').onclick = (e) =>
+  window.IS.showOnlyZones();
+document.getElementById('showFull').onclick = (e) => window.IS.showFull();
+document.getElementById('stepNext').onclick = (e) => window.IS.stepNext();
+document.getElementById('stepPrev').onclick = (e) => window.IS.stepPrev();
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -49,7 +52,14 @@ let lastTimestamp;
 const scene = new THREE.Scene();
 
 // scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
-scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
+// scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
+scene.add(
+  getRoad(
+    document.getElementById('intersection').offsetHeight * 2,
+    document.getElementById('intersection').offsetHeight * 2,
+    nZones,
+  ),
+); // set height == width
 scene.add(ambientLight);
 scene.add(dirLight);
 
@@ -136,9 +146,13 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: 'high-performance',
 });
-renderer.setSize(window.innerWidth, window.innerHeight);
+// renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(
+  document.getElementById('intersection').offsetWidth,
+  document.getElementById('intersection').offsetWidth,
+);
 if (config.shadows) renderer.shadowMap.enabled = true;
-document.body.appendChild(renderer.domElement);
+document.getElementById('intersection').appendChild(renderer.domElement);
 
 reset();
 
