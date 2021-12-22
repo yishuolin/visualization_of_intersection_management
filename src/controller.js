@@ -1,5 +1,9 @@
-const move = (car, t) => {
-  const path = car.paths[car.stage];
+const move = (car, t, isReversed) => {
+  const path = isReversed
+    ? new THREE.CatmullRomCurve3([
+        ...car.paths[car.stage - 1].getPoints().reverse(), // TODO: -1 might encounter edge cases
+      ])
+    : car.paths[car.stage];
 
   // position
   const position = path.getPointAt(t);

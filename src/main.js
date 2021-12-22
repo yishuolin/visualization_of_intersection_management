@@ -163,8 +163,11 @@ let animationInterval = null;
 let counter = 0;
 let numOfSteps = 0;
 const TIME_DELTA = 1000 / FPS;
+let isReversed = false;
 
 const nextButton = document.getElementById('next');
+const prevButton = document.getElementById('prev');
+prevButton.disabled = true;
 
 const getStepNext = () => {
   return numOfSteps >= 4 ? [0, 1, 2, 4] : [0, 1, 2, 3, 4];
@@ -173,28 +176,37 @@ const getStepNext = () => {
 const stepsStack = new Stack();
 
 nextButton.addEventListener('click', () => {
+  isReversed = false;
   numOfSteps++;
   stepsStack.push(getStepNext());
-  animationInterval = setInterval(_animation, TIME_DELTA);
+  animationInterval = setInterval(animation, TIME_DELTA);
   nextButton.disabled = true;
 });
-function _animation() {
+prevButton.addEventListener('click', () => {
+  isReversed = true;
+  numOfSteps--;
+  animationInterval = setInterval(animation, TIME_DELTA);
+  prevButton.disabled = true;
+});
+function animation() {
   counter += TIME_DELTA;
   if (counter > FRAME_TIME) {
     counter = 0;
     clearInterval(animationInterval);
     nextButton.disabled = false;
+    prevButton.disabled = !numOfSteps;
     cars.forEach((car) => {
       if (stepsStack.top().includes(car.carId)) {
-        car.stage++;
+        car.stage += isReversed ? -1 : 1;
       }
     });
+    if (isReversed) stepsStack.pop();
   } else {
     document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
     const t = counter / FRAME_TIME;
     cars.forEach((car) => {
       if (stepsStack.top().includes(car.carId)) {
-        move(car, t);
+        move(car, t, isReversed);
       }
     });
     renderer.render(scene, camera);
