@@ -1,3 +1,4 @@
+import {getPaths} from './road';
 import {
   LEFT,
   RIGHT,
@@ -20,7 +21,7 @@ const getStartTrajectory = {
 };
 
 const getPlayerAngleInitial = {
-  [LANE_1]: (Math.PI / 2) * 3,
+  [LANE_1]: Math.PI * 1.5,
   [LANE_2]: Math.PI / 2,
   [LANE_3]: Math.PI,
   [LANE_4]: 0,
@@ -29,7 +30,7 @@ const getPlayerAngleInitial = {
 const getRotationZ = {
   [LANE_1]: 0,
   [LANE_2]: Math.PI,
-  [LANE_3]: (Math.PI / 2) * 3,
+  [LANE_3]: Math.PI * 1.5,
   [LANE_4]: Math.PI / 2,
 };
 
@@ -42,18 +43,13 @@ function Car(config) {
     new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
     new THREE.MeshLambertMaterial({color}),
   );
-  const transparentMesh = new THREE.Mesh(
-    new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
-    new THREE.MeshLambertMaterial({color, opacity: 0, transparent: true}),
-  );
-  main.position.x = -CAR_LENGTH / 2;
+
   main.position.z = 12;
   main.castShadow = true;
   main.receiveShadow = true;
-  transparentMesh.position.x = CAR_LENGTH / 2;
   car.add(main);
-  car.add(transparentMesh);
 
+  car.carId = config.carId;
   car.zones = config.zones;
   car.position.x = config.position.x;
   car.position.y = config.position.y;
@@ -65,6 +61,10 @@ function Car(config) {
   car.radius = 0;
   car.playerAngleMoved = 0;
   car.playerAngleInitial = getPlayerAngleInitial[config.onLane];
+
+  car.stage = config.stage;
+
+  car.paths = getPaths(car, config.trajectory);
 
   car.mesh = main;
   return car;

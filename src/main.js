@@ -3,6 +3,7 @@ import {camera, cameraWidth, cameraHeight} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
+import {Stack} from './helpers';
 import {
   nZones,
   FRAME_TIME,
@@ -14,6 +15,9 @@ import {
   CAR_LENGTH,
   CAR_WIDTH,
   FPS,
+  TURN_LEFT,
+  TURN_RIGHT,
+  GO_STRAIGHT,
 } from './constants';
 import IntersectionSimulation from './intersection-management/intersection-simulation';
 
@@ -27,6 +31,8 @@ document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
 document.getElementById('showFull').onclick = (e) => IS.showFull();
 document.getElementById('stepNext').onclick = (e) => IS.stepNext();
 document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
+
+const Intersection = document.getElementById('intersection');
 
 // The Pythagorean theorem says that the distance between two points is
 // the square root of the sum of the horizontal and vertical distance's square
@@ -45,81 +51,68 @@ const config = {
 };
 
 let ready;
-let lastTimestamp;
 
 const scene = new THREE.Scene();
 
 // scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
-// scene.add(getRoad(cameraHeight * 2, cameraHeight * 2, nZones)); // set height == width
 scene.add(
-  getRoad(
-    document.getElementById('intersection').offsetHeight * 2,
-    document.getElementById('intersection').offsetHeight * 2,
-    nZones,
-  ),
-); // set height == width
+  getRoad(Intersection.offsetHeight * 2, Intersection.offsetHeight * 2, nZones),
+);
+
 scene.add(ambientLight);
 scene.add(dirLight);
 
 const carsConfig = [
   {
-    zones: [
-      {x: 0, y: 0},
-      {x: 1, y: 0},
-      {x: 1, y: 0},
-      {x: 1, y: 1},
-    ],
+    carId: 0,
     position: {
-      // TODO: should be more responsive to handle nZones changes
-      // x: -window.intersectionArea.width / nZones - CAR_LENGTH / 2,
-      x: -window.intersectionArea.width / nZones,
+      // TODO: should be dynamic
+      x: -window.intersectionArea.width / nZones - CAR_LENGTH, // TODO: 3 should be a constant
       y: -window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_1,
+    trajectory: TURN_LEFT,
+    stage: 1,
   },
   {
-    zones: [
-      {x: 1, y: 1},
-      {x: 1, y: 1},
-      {x: 1, y: 1},
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-    ],
+    carId: 1,
     position: {
-      // TODO: should be more responsive to handle nZones changes
-      x: window.intersectionArea.width / nZones,
+      x: window.intersectionArea.width / nZones + CAR_LENGTH,
       y: window.intersectionArea.height / nZones / 2,
     },
     onLane: LANE_2,
+    trajectory: TURN_LEFT,
+    stage: 1,
   },
-  // {
-  //   zones: [
-  //     {x: 1, y: 0},
-  //     {x: 1, y: 0},
-  //     {x: 1, y: 1},
-  //     {x: 0, y: 1},
-  //   ],
-  //   position: {
-  //     // TODO: should be more responsive to handle nZones changes
-  //     x: window.intersectionArea.width / nZones / 2,
-  //     y: -window.intersectionArea.height / nZones - CAR_LENGTH / 2,
-  //   },
-  //   onLane: LANE_4,
-  // },
   {
-    zones: [
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-      {x: 0, y: 0},
-      {x: 0, y: 0},
-      {x: 1, y: 0},
-    ],
+    carId: 2,
     position: {
-      // TODO: should be more responsive to handle nZones changes
+      x: window.intersectionArea.width / nZones / 2,
+      y: -window.intersectionArea.height / nZones - CAR_LENGTH,
+    },
+    onLane: LANE_4,
+    trajectory: GO_STRAIGHT,
+    stage: 1,
+  },
+  {
+    carId: 3,
+    position: {
       x: -window.intersectionArea.width / nZones / 2,
-      y: window.intersectionArea.height / nZones,
+      y: window.intersectionArea.height / nZones + CAR_LENGTH,
     },
     onLane: LANE_3,
+    trajectory: TURN_RIGHT,
+    stage: 1,
+  },
+  {
+    carId: 4,
+    position: {
+      x: -window.intersectionArea.width / nZones - CAR_LENGTH * 3,
+      y: -window.intersectionArea.height / nZones / 2,
+    },
+    onLane: LANE_1,
+    trajectory: GO_STRAIGHT,
+    stage: 0,
   },
 ];
 
@@ -146,18 +139,13 @@ const renderer = new THREE.WebGLRenderer({
   powerPreference: 'high-performance',
 });
 // renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setSize(
-  document.getElementById('intersection').offsetWidth,
-  document.getElementById('intersection').offsetWidth,
-);
+renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
 if (config.shadows) renderer.shadowMap.enabled = true;
-document.getElementById('intersection').appendChild(renderer.domElement);
+Intersection.appendChild(renderer.domElement);
 
 reset();
 
 function reset() {
-  lastTimestamp = undefined;
-
   // Render the scene
   renderer.render(scene, camera);
   ready = true;
@@ -168,133 +156,50 @@ startGame();
 function startGame() {
   if (ready) {
     ready = false;
-    // renderer.setAnimationLoop(animation);
   }
 }
 
-// let startTimestamp = 0;
-// let resumeTimestamp = 0;
-// let pauseTimestamp = 0;
-// let resume = false;
-
 let animationInterval = null;
 let counter = 0;
-let numOfFrame = 0;
+let numOfSteps = 0;
 const TIME_DELTA = 1000 / FPS;
 
-document.getElementById('next').addEventListener('click', () => {
+const nextButton = document.getElementById('next');
+
+const getStepNext = () => {
+  return numOfSteps >= 4 ? [0, 1, 2, 4] : [0, 1, 2, 3, 4];
+};
+
+const stepsStack = new Stack();
+
+nextButton.addEventListener('click', () => {
+  numOfSteps++;
+  stepsStack.push(getStepNext());
   animationInterval = setInterval(_animation, TIME_DELTA);
+  nextButton.disabled = true;
 });
 function _animation() {
   counter += TIME_DELTA;
   if (counter > FRAME_TIME) {
     counter = 0;
-    numOfFrame++;
     clearInterval(animationInterval);
-  } else {
-    document.getElementById('step').innerHTML = `Step: ${numOfFrame + 1}`;
+    nextButton.disabled = false;
     cars.forEach((car) => {
-      move(car, numOfFrame, TIME_DELTA);
+      if (stepsStack.top().includes(car.carId)) {
+        car.stage++;
+      }
+    });
+  } else {
+    document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
+    const t = counter / FRAME_TIME;
+    cars.forEach((car) => {
+      if (stepsStack.top().includes(car.carId)) {
+        move(car, t);
+      }
     });
     renderer.render(scene, camera);
   }
 }
 
-/*
-function animation(originalTimestamp) {
-  const timestamp = pauseTimestamp + originalTimestamp - resumeTimestamp;
-
-  if (resume) {
-    resumeTimestamp = originalTimestamp;
-    resume = false;
-    return;
-  }
-
-  // init lastTimestamp
-  if (!lastTimestamp) {
-    lastTimestamp = timestamp;
-    return;
-  }
-  // end of game
-  if (startTimestamp >= ANIMATION_TIME) {
-    return;
-  }
-  // end of one frame
-  if (timestamp - startTimestamp >= FRAME_TIME) {
-    startTimestamp = timestamp;
-    return;
-  }
-  const timeDelta = timestamp - lastTimestamp;
-
-  cars.forEach((car) => {
-    move(car, timestamp, timeDelta);
-  });
-
-  renderer.render(scene, camera);
-  lastTimestamp = timestamp;
-
-  // TODO: need refactor
-  document.getElementById('stop').addEventListener('click', () => {
-    pauseTimestamp = timestamp;
-    renderer.setAnimationLoop(null);
-  });
-  document.getElementById('resume').addEventListener('click', () => {
-    resume = true;
-    renderer.setAnimationLoop(animation);
-  });
-}
-*/
-
-/*
-// Another Animation System
-// https://blog.csdn.net/ithanmang/article/details/84062933
-// https://stackoverflow.com/questions/40434314/threejs-animationclip-example-needed
-
-// POSITION
-playerCar.name = 'playerCar';
-const positionKF = new THREE.KeyframeTrack(
-  'playerCar.position',
-  [0, 2],
-  [0, 0, 0, 100, 100, 0],
-);
-
-// ROTATION
-// set up rotation about x axis
-const zAxis = new THREE.Vector3(0, 0, 1);
-
-var qInitial = new THREE.Quaternion().setFromAxisAngle(zAxis, 0);
-var qFinal = new THREE.Quaternion().setFromAxisAngle(zAxis, Math.PI / 2);
-var quaternionKF = new THREE.QuaternionKeyframeTrack(
-  '.quaternion',
-  [0, 1],
-  [
-    qInitial.x,
-    qInitial.y,
-    qInitial.z,
-    qInitial.w,
-    qFinal.x,
-    qFinal.y,
-    qFinal.z,
-    qFinal.w,
-  ],
-);
-
-// create an animation sequence with the tracks
-// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-const clip = new THREE.AnimationClip('action', 2, [positionKF, quaternionKF]);
-
-// setup the AnimationMixer
-const mixer = new THREE.AnimationMixer(playerCar);
-
-// create a ClipAction and set it to play
-const clipAction = mixer.clipAction(clip);
-clipAction.setLoop(THREE.LoopOnce).play();
-
-const clock = new THREE.Clock();
-const _animate = () => {
-  requestAnimationFrame(_animate);
-  renderer.render(scene, camera);
-  mixer.update(clock.getDelta());
-};
-_animate();
-*/
+// https://stackoverflow.com/questions/35495812/move-an-object-along-a-path-or-spline-in-threejs
+// https://juejin.cn/post/6976897135794978853
