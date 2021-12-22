@@ -5,17 +5,13 @@ import {
   BARRIER_LINE_WIDTH,
   ZONE_LINE_WIDTH,
   INTERSECTION_AREA_SIZE,
-  LANE_1,
-  LANE_2,
-  LANE_3,
-  LANE_4,
   TURN_LEFT,
   TURN_RIGHT,
   GO_STRAIGHT,
   CAR_LENGTH,
 } from './constants';
+import {getRotationZ} from './utils';
 
-const RADIAN_0 = 0;
 const RADIAN_90 = Math.PI / 2;
 const RADIAN_180 = Math.PI;
 const RADIAN_270 = Math.PI * 1.5;
@@ -145,18 +141,12 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
 const getPreTurnLeft = () => {
   return new THREE.CatmullRomCurve3([
     ...getLine(-gridWidth / 2, -gridWidth / 2, 0, -gridWidth / 2).getPoints(),
-    ...getCircle(
-      0,
-      0,
-      gridWidth / 2,
-      RADIAN_270,
-      (Math.PI * 7) / 4,
-    ).getPoints(),
+    ...getCircle(0, 0, gridWidth / 2, RADIAN_270, RADIAN_315).getPoints(),
   ]);
 };
 const getPostTurnLeft = () => {
   return new THREE.CatmullRomCurve3([
-    ...getCircle(0, 0, gridWidth / 2, Math.PI * 1.75, RADIAN_360).getPoints(),
+    ...getCircle(0, 0, gridWidth / 2, RADIAN_315, RADIAN_360).getPoints(),
     ...getLine(gridWidth / 2, 0, gridWidth / 2, gridWidth / 2).getPoints(),
   ]);
 };
@@ -196,22 +186,18 @@ const getPreTurnRight = () => {
   ]);
 };
 
-// TODO: duplicated with car.js
-const getRotationZ = {
-  [LANE_1]: 0,
-  [LANE_2]: Math.PI,
-  [LANE_3]: Math.PI * 1.5,
-  [LANE_4]: Math.PI / 2,
+const getInitialPath = () => {
+  return getLine(
+    -gridWidth - CAR_LENGTH * 3,
+    -gridWidth / 2,
+    -gridWidth - CAR_LENGTH,
+    -gridWidth / 2,
+  );
 };
 
 const getBasePaths = () => ({
   [TURN_LEFT]: [
-    getLine(
-      -gridWidth - CAR_LENGTH * 3,
-      -gridWidth / 2,
-      -gridWidth - CAR_LENGTH,
-      -gridWidth / 2,
-    ), // TODO: duplicated
+    getInitialPath(),
     getLine(
       -gridWidth - CAR_LENGTH,
       -gridWidth / 2,
@@ -234,12 +220,7 @@ const getBasePaths = () => ({
     ),
   ],
   [TURN_RIGHT]: [
-    getLine(
-      -gridWidth - CAR_LENGTH * 3,
-      -gridWidth / 2,
-      -gridWidth - CAR_LENGTH,
-      -gridWidth / 2,
-    ),
+    getInitialPath(),
     getPreTurnRight(),
     getPostTurnRight(),
     getLine(
@@ -250,12 +231,7 @@ const getBasePaths = () => ({
     ),
   ],
   [GO_STRAIGHT]: [
-    getLine(
-      -gridWidth - CAR_LENGTH * 3,
-      -gridWidth / 2,
-      -gridWidth - CAR_LENGTH,
-      -gridWidth / 2,
-    ),
+    getInitialPath(),
     getLine(
       -gridWidth - CAR_LENGTH,
       -gridWidth / 2,
@@ -277,6 +253,7 @@ const getBasePaths = () => ({
     ),
   ],
 });
+
 const getPaths = (car, trajectory) => {
   const basePaths = getBasePaths()[trajectory];
   const degree = getRotationZ[car.onLane];

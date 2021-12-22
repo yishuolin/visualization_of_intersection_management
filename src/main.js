@@ -1,13 +1,12 @@
 import {ambientLight, dirLight} from './light';
-import {camera, cameraWidth, cameraHeight} from './camera';
+import {camera} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
-import {Stack} from './helpers';
+import {Stack} from './utils';
 import {
   nZones,
   FRAME_TIME,
-  ANIMATION_TIME,
   LANE_1,
   LANE_2,
   LANE_3,
@@ -34,23 +33,7 @@ document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
 
 const Intersection = document.getElementById('intersection');
 
-// The Pythagorean theorem says that the distance between two points is
-// the square root of the sum of the horizontal and vertical distance's square
-function getDistance(coordinate1, coordinate2) {
-  const horizontalDistance = coordinate2.x - coordinate1.x;
-  const verticalDistance = coordinate2.y - coordinate1.y;
-  return Math.sqrt(horizontalDistance ** 2 + verticalDistance ** 2);
-}
-
-const config = {
-  showHitZones: false,
-  shadows: false, // Use shadow
-  trees: false, // Add trees to the map
-  curbs: false, // Show texture on the extruded geometry
-  grid: false, // Show grid helper
-};
-
-let ready;
+const showShadows = false;
 
 const scene = new THREE.Scene();
 
@@ -127,36 +110,19 @@ const cars = carsConfig.map((config) => {
   return car;
 });
 
-// if (config.grid) {
-//   const gridHelper = new THREE.GridHelper(80, 8);
-//   gridHelper.rotation.x = Math.PI / 2;
-//   scene.add(gridHelper);
-// }
-
 // Set up renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: 'high-performance',
 });
-// renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
-if (config.shadows) renderer.shadowMap.enabled = true;
+if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
 
 reset();
 
 function reset() {
-  // Render the scene
   renderer.render(scene, camera);
-  ready = true;
-}
-
-startGame();
-
-function startGame() {
-  if (ready) {
-    ready = false;
-  }
 }
 
 let animationInterval = null;
@@ -181,20 +147,23 @@ nextButton.addEventListener('click', () => {
   stepsStack.push(getStepNext());
   animationInterval = setInterval(animation, TIME_DELTA);
   nextButton.disabled = true;
+  prevButton.disabled = true;
 });
 prevButton.addEventListener('click', () => {
   isReversed = true;
   numOfSteps--;
   animationInterval = setInterval(animation, TIME_DELTA);
+  nextButton.disabled = true;
   prevButton.disabled = true;
 });
+
 function animation() {
   counter += TIME_DELTA;
   if (counter > FRAME_TIME) {
     counter = 0;
     clearInterval(animationInterval);
     nextButton.disabled = false;
-    prevButton.disabled = !numOfSteps;
+    prevButton.disabled = numOfSteps === 0;
     cars.forEach((car) => {
       if (stepsStack.top().includes(car.carId)) {
         car.stage += isReversed ? -1 : 1;
@@ -203,10 +172,9 @@ function animation() {
     if (isReversed) stepsStack.pop();
   } else {
     document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
-    const t = counter / FRAME_TIME;
     cars.forEach((car) => {
       if (stepsStack.top().includes(car.carId)) {
-        move(car, t, isReversed);
+        move(car, counter / FRAME_TIME, isReversed);
       }
     });
     renderer.render(scene, camera);
