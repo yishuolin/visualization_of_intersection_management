@@ -1,8 +1,8 @@
-import IntersectionManagement from './intersection-management';
+import IntersectionManagement from './intersectionManagement.js';
 
 export default class extends IntersectionManagement {
-    constructor(nCars, maxLaneCars = 5, nPrev = 50) {
-        super(nCars, maxLaneCars);
+    constructor(nPrev = 50) {
+        super();
         this.carPositions = {};
         this.nPrev = nPrev;
         this.prevNodes = [];
@@ -30,7 +30,7 @@ export default class extends IntersectionManagement {
     }
     _getZeroIncomerNodes() {
         return this.timingConflictGraph.elements().filter('.cy-node-current').filter((node)=>{
-            console.log(node.outgoers('edge[type = 1]')[0]?.target().incomers('edge[type != 1]').not('.cy-disabled, .cy-transparent'));
+            // console.log(node.outgoers('edge[type = 1]')[0]?.target().incomers('edge[type != 1]').not('.cy-disabled, .cy-transparent'));
             return (node.outgoers('edge[type = 1]')[0]?.target().incomers('edge[type != 1]').not('.cy-disabled, .cy-transparent').length) ? false: true;
         })
     }
@@ -64,6 +64,7 @@ export default class extends IntersectionManagement {
             }
         });
         nodes.addClass(['cy-node-current']);
+        return this.carPaths;
     }
 
     stepNext() {
@@ -96,6 +97,7 @@ export default class extends IntersectionManagement {
                 nextNode.addClass(['cy-node-current']);
             }
         });
+        return movableNodes.map((d)=>d.data('car'));
     }
     stepPrev() {
         let prevNodes = this.prevNodes.pop();
