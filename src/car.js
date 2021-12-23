@@ -1,7 +1,7 @@
 import {getPaths} from './road';
 import {CAR_HEIGHT, CAR_WIDTH, CAR_LENGTH} from './constants';
 import {getRotationZ, getRandomColor} from './utils';
-const showTexture = false;
+const showTexture = true;
 
 function Car(config) {
   const car = new THREE.Group();

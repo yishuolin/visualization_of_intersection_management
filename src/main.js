@@ -33,7 +33,7 @@ document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
 
 const Intersection = document.getElementById('intersection');
 
-const showShadows = false;
+const showShadows = true  ;
 
 const scene = new THREE.Scene();
 

@@ -1,3 +1,10 @@
+import {
+  LANE_1,
+  LANE_2,
+  LANE_3,
+  LANE_4,
+} from './constants';
+
 const move = (car, t, isReversed) => {
   const path = isReversed
     ? new THREE.CatmullRomCurve3([
@@ -11,8 +18,11 @@ const move = (car, t, isReversed) => {
 
   // rotation
   const tangent = path.getTangentAt(t).normalize();
-  const angle = -Math.atan(tangent.x / tangent.y);
+  let angle = (tangent.y < 0.1 && tangent.y > -0.1) ? -Math.PI/2 : -Math.atan(tangent.x / tangent.y);
   const up = new THREE.Vector3(0, 0, 1);
-  car.quaternion.setFromAxisAngle(up, angle + Math.PI / 2);
+  if (car.onLane == LANE_2 || car.onLane == LANE_3)
+      angle += Math.PI;
+  car.quaternion.setFromAxisAngle(up, angle + Math.PI/2); 
+  
 };
 export {move};
