@@ -6,6 +6,7 @@ import {
 } from './constants';
 
 const move = (car, t, isReversed) => {
+  if (!car.paths[car.stage]) return;
   const path = isReversed
     ? new THREE.CatmullRomCurve3([
         ...car.paths[car.stage - 1].getPoints().reverse(), // TODO: -1 might encounter edge cases
