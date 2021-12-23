@@ -1,3 +1,4 @@
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {ambientLight, dirLight} from './light';
 import {camera} from './camera';
 import {getRoad} from './road';
@@ -158,6 +159,7 @@ const getInitialPosition = (car) => {
 renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
 if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
+const controls = new OrbitControls( camera, renderer.domElement );
 
 function reset() {
   IS.randomGraph(6, 2);
@@ -233,9 +235,8 @@ function animation() {
         move(car, counter / FRAME_TIME, isReversed);
       }
     });
-    renderer.render(scene, camera);
   }
 }
-
+setInterval(()=>renderer.render(scene, camera), 10)
 // https://stackoverflow.com/questions/35495812/move-an-object-along-a-path-or-spline-in-threejs
 // https://juejin.cn/post/6976897135794978853
