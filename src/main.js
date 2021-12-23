@@ -113,7 +113,7 @@ const cars = carsConfig.map((config) => {
 // Set up renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  powerPreference: 'high-performance',
+  // powerPreference: 'high-performance',
 });
 renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
 if (showShadows) renderer.shadowMap.enabled = true;

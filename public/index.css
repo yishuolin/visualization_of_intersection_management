@@ -31,3 +31,15 @@ body {
   color: white;
   font-size: 16px;
 }
+
+button {
+  border-radius: 5px;
+  padding: 3px;
+  font-size: 16px;
+  margin: 3px;
+  cursor: pointer;
+}
+
+button[disabled] {
+  cursor: not-allowed;
+}
