@@ -1,4 +1,6 @@
-const aspectRatio = window.innerWidth / window.innerHeight;
+const aspectRatio =
+  document.getElementById('intersection').offsetWidth /
+  document.getElementById('intersection').offsetHeight;
 const cameraWidth = 960;
 const cameraHeight = cameraWidth / aspectRatio;
 
@@ -11,7 +13,7 @@ const camera = new THREE.OrthographicCamera(
   700, // far plane
 );
 
-camera.position.set(0, -210, 300);
+camera.position.set(0, -150, 300);
 camera.lookAt(0, 0, 0);
 
 export {camera, cameraWidth, cameraHeight};

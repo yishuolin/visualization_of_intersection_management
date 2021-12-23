@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "three": "^0.134.0"
+    "cytoscape": "^3.20.0",
+    "cytoscape-d3-force": "^1.1.4"
   },
   "devDependencies": {
     "babel-loader": "^8.2.3",
@@ -19,6 +19,7 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "prettier": "^2.5.0",
+    "raw-loader": "^4.0.2",
     "style-loader": "^3.3.1",
     "url-loader": "^4.1.1",
     "webpack": "^5.64.4",
