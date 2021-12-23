@@ -23,6 +23,8 @@ const move = (car, t, isReversed) => {
   let angle = -Math.atan(tangent.x / tangent.y);
   if (tangent.y < 0)
     angle += Math.PI;
+  if (isReversed)
+    angle += Math.PI;
   car.quaternion.setFromAxisAngle(up, angle+Math.PI/2); 
   
 };
