@@ -82,7 +82,7 @@ export default class {
             position: [path.lane, order]
           }
         })
-        addLaneData(path.lane, order, {car: car});
+        addLaneData(path.lane, order, {car: car, lane: path.lane});
       }
       for (let order = path.order; order > 1; order--) {
         this.timingConflictGraph.add({
@@ -142,7 +142,7 @@ export default class {
           }
         })
         
-        addLaneData(path.targetLane, order, {car: car});
+        addLaneData(path.targetLane, order, {car: car, lane: path.lane});
       }
       
       for (let order = 1; order <= this.maxLeaveOrder-1; order++) {
@@ -196,19 +196,21 @@ export default class {
         
         for (let index = 0; index < sortedcars.length; index++) {
           for (let index2 = index+1; index2 < sortedcars.length; index2++) {
-            const car = sortedcars[index].car;
-            const nextCar = sortedcars[index2].car;
-            this.timingConflictGraph.add({
-              group: 'edges',
-              data: {
-                id: `${car}:l:[${lane},${order}]_${nextCar}:l:[${lane},${order}]`,
-                source: `${car}:l:[${lane},${order}]`,
-                target: `${nextCar}:l:[${lane},${order}]`,
-                inLane: true,
-                type: 2
-              },
-              classes: 'cy-edge-type2'
-            })
+            const car = sortedcars[index];
+            const nextCar = sortedcars[index2];
+            if (car.lane == nextCar.lane) {
+              this.timingConflictGraph.add({
+                group: 'edges',
+                data: {
+                  id: `${car.car}:l:[${lane},${order}]_${nextCar.car}:l:[${lane},${order}]`,
+                  source: `${car.car}:l:[${lane},${order}]`,
+                  target: `${nextCar.car}:l:[${lane},${order}]`,
+                  inLane: true,
+                  type: 2
+                },
+                classes: 'cy-edge-type2'
+              })
+            }
           }
         }
       }
