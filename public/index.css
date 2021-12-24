@@ -4,28 +4,36 @@ body {
 }
 .container {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
+  overflow-y: hidden;
 }
 #intersection {
   width: 50%;
   height: 100vh;
+  overflow-y: hidden;
 }
 #graph {
   width: 50%;
   height: 100vh;
   border-left: 3px solid black;
+  overflow-y: hidden;
 }
 #cy,
 #resource-conflict-graph {
-  height: 50vh;
+  height: 55vh;
 }
 #cy {
   border-bottom: 2px solid black;
 }
-#buttons {
+#bottom-buttons {
   position: fixed;
   bottom: 0;
+}
+#top-buttons {
+  position: fixed;
+  top: 0;
+  z-index: 100;
 }
 #step {
   color: white;

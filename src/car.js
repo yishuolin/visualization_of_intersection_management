@@ -1,8 +1,8 @@
 import {getPaths} from './road';
 import {CAR_HEIGHT, CAR_WIDTH, CAR_LENGTH} from './constants';
 import {getRotationZ, getRandomColor} from './utils';
-import {font} from './font'
-import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry'
+import {font} from './font';
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
 const showTexture = true;
 
 function Car(config) {
@@ -26,7 +26,9 @@ function Car(config) {
   car.onLane = config.onLane;
   car.rotation.z = getRotationZ[config.onLane];
   car.stage = config.stage;
-  car.paths = getPaths(car, config.trajectory);
+  car.paths = getPaths(car, config.trajectory, config.order);
+  car.targetLane = config.targetLane;
+
   car.mesh = main;
 
   if (showTexture) {
@@ -67,22 +69,22 @@ function getCarSideTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-function Text(string, size=15) {
+function Text(string, size = 15) {
   // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
   const geometry = new TextGeometry(string, {
-      font: font,
-      size: size,
-      height: 1,
-      curveSegments: 10,
-      bevelEnabled: false,
-      bevelOffset: 0,
-      bevelSegments: 1,
-      bevelSize: 0.3,
-      bevelThickness: 1
+    font: font,
+    size: size,
+    height: 1,
+    curveSegments: 10,
+    bevelEnabled: false,
+    bevelOffset: 0,
+    bevelSegments: 1,
+    bevelSize: 0.3,
+    bevelThickness: 1,
   }).center();
   const materials = [
-      new THREE.MeshPhongMaterial({ color: 0x000000 }), // front
-      new THREE.MeshPhongMaterial({ color: 0x000000 }) // side
+    new THREE.MeshPhongMaterial({color: 0x000000}), // front
+    new THREE.MeshPhongMaterial({color: 0x000000}), // side
   ];
   const textMesh = new THREE.Mesh(geometry, materials);
   // textMesh.castShadow = true
@@ -139,7 +141,7 @@ const addDetailedTexture = (car) => {
   const text = new Text(String(car.carId));
   text.position.z = 40;
   text.position.x = -5;
-  text.rotation.z = -Math.PI/2;
+  text.rotation.z = -Math.PI / 2;
   car.add(text);
 };
 

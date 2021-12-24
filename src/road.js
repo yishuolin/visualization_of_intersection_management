@@ -186,18 +186,24 @@ const getPreTurnRight = () => {
   ]);
 };
 
-const getInitialPath = () => {
-  return getLine(
-    -gridWidth - CAR_LENGTH * 3,
-    -gridWidth / 2,
-    -gridWidth - CAR_LENGTH,
-    -gridWidth / 2,
-  );
+const getInitialPath = (order) => {
+  let paths = [];
+  for (let i = 2; i <= order; i++) {
+    paths.unshift(
+      getLine(
+        -gridWidth - CAR_LENGTH * (i * 2 - 1),
+        -gridWidth / 2,
+        -gridWidth - CAR_LENGTH * (i * 2 - 3),
+        -gridWidth / 2,
+      ),
+    );
+  }
+  return paths;
 };
 
-const getBasePaths = () => ({
+const getBasePaths = (order) => ({
   [TURN_LEFT]: [
-    getInitialPath(),
+    ...getInitialPath(order),
     getLine(
       -gridWidth - CAR_LENGTH,
       -gridWidth / 2,
@@ -220,7 +226,7 @@ const getBasePaths = () => ({
     ),
   ],
   [TURN_RIGHT]: [
-    getInitialPath(),
+    ...getInitialPath(order),
     getPreTurnRight(),
     getPostTurnRight(),
     getLine(
@@ -231,7 +237,7 @@ const getBasePaths = () => ({
     ),
   ],
   [GO_STRAIGHT]: [
-    getInitialPath(),
+    ...getInitialPath(order),
     getLine(
       -gridWidth - CAR_LENGTH,
       -gridWidth / 2,
@@ -254,8 +260,8 @@ const getBasePaths = () => ({
   ],
 });
 
-const getPaths = (car, trajectory) => {
-  const basePaths = getBasePaths()[trajectory];
+const getPaths = (car, trajectory, order) => {
+  const basePaths = getBasePaths(order)[trajectory];
   const degree = getRotationZ[car.onLane];
   const rotatedPath = basePaths.map((CatmullRomCurve3) => {
     const newCatmullRomCurve3 = new THREE.CatmullRomCurve3();

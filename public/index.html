@@ -9,19 +9,19 @@
 	</head>
 	<body>
 		<script src="three.js"></script>
+    <div id="top-buttons">
+      <button id="prev">Prev</button>
+      <button id="next">Next</button>
+      <span id="step">Step: 0</span>
+    </div>
     <div class="container">
-      <div id="intersection">
-        <button id="prev">Prev</button>
-        <button id="next">Next</button>
-        <span id="step">Step: 0</span>
-      </div>
+      <div id="intersection"></div>
       <div id="graph">
-        <div id="cy">
-        </div>
+        <div id="cy"></div>
         <div id="resource-conflict-graph"></div>
       </div>
     </div>
-    <div id="buttons">
+    <div id="bottom-buttons">
       <button id="randCars">Generate Random Cars</button>
       <button id="randSol">Pick Random Solution</button>
       <button id="checkCycle">Check Cycle</button>
