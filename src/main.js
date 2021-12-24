@@ -27,7 +27,11 @@ const scene = new THREE.Scene();
 
 // scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
 scene.add(
-  getRoad(Intersection.offsetHeight * 2, Intersection.offsetHeight * 2, nZones),
+  getRoad(
+    Intersection.offsetHeight * 2.5,
+    Intersection.offsetHeight * 2.5,
+    nZones,
+  ),
 );
 
 scene.add(ambientLight);
@@ -59,7 +63,7 @@ const getCarsConfig = (cars) => {
   }
 };
 
-renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
+renderer.setSize(Intersection.offsetWidth, Intersection.offsetHeight);
 if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
