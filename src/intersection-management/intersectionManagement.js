@@ -17,7 +17,20 @@ export default class {
         wheelSensitivity: 0.1,
         style: cycss
     });
-    this.timingConflictGraph.style().selector('node').style('label', (node) => node.data('id')).update();
+    this.timingConflictGraph.style().selector('node').style('label', (node) => {
+      let [car, type, xy] = node.data('id').split(':');
+      let str = `car: ${car}\n`;
+      if (type == "l") {
+        let [x, y] = xy.substr(1, xy.length-2).split(',');
+        str += `lane: ${x.split('_')[1]}\n`;
+        str += `order: ${y}`;
+      }
+      else {
+        str += `zone: ${xy}`;
+      }
+      console.log(node.data('id').split(':'));
+      return str;
+    }).update();
   }
   
   _layoutGraph() {
