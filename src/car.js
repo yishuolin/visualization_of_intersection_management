@@ -26,7 +26,7 @@ function Car(config) {
   car.onLane = config.onLane;
   car.rotation.z = getRotationZ[config.onLane];
   car.stage = config.stage;
-  car.paths = getPaths(car, config.trajectory);
+  car.paths = getPaths(car, config.trajectory, config.order);
   car.targetLane = config.targetLane;
 
   car.mesh = main;

@@ -30,8 +30,6 @@ const getNewPoint = (car, lastPoint) => {
       lastPoint.z,
     ),
   };
-  console.log(car.targetLane);
-  console.log(laneSwitch[car.targetLane]);
   return laneSwitch[car.targetLane];
 };
 const move = (car, t, isReversed) => {

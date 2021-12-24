@@ -49,9 +49,11 @@ const getCarsConfig = (cars) => {
         carId: parseInt(key),
         trajectory: car.direction,
         onLane: car.lane,
-        stage: 1 - (car.order - 1), // TODO
+        // stage: 1 - (car.order - 1), // TODO
+        stage: 0,
         position: getInitialPosition[car.lane](car),
         targetLane: laneAdapter[car.targetLane],
+        order: car.order,
       });
     }
   }
@@ -65,7 +67,7 @@ controls.maxPolarAngle = Math.PI / 3;
 controls.minPolarAngle = 0;
 
 function reset() {
-  IS.randomGraph(6, 2);
+  IS.randomGraph(6, 4);
   getCarsConfig(IS.reset());
 }
 reset();
