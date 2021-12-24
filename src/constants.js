@@ -33,6 +33,9 @@ const TURN_LEFT = 'turn_left';
 const TURN_RIGHT = 'turn_right';
 const GO_STRAIGHT = 'go_straight';
 
+// simulation
+const MAX_PREV_STEPS = 500;
+
 export {
   nZones,
   FRAME_TIME,
@@ -60,4 +63,5 @@ export {
   TURN_LEFT,
   TURN_RIGHT,
   GO_STRAIGHT,
+  MAX_PREV_STEPS,
 };
