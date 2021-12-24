@@ -18,10 +18,11 @@ import {
   TURN_LEFT,
   TURN_RIGHT,
   GO_STRAIGHT,
+  MAX_PREV_STEPS,
 } from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
-const IS = new IntersectionSimulation(4);
+const IS = new IntersectionSimulation(MAX_PREV_STEPS);
 document.getElementById('randCars').onclick = (e) => IS.randomGraph(6, 2);
 document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = (e) =>
@@ -212,6 +213,7 @@ nextButton.addEventListener('click', () => {
 prevButton.addEventListener('click', () => {
   isReversed = true;
   numOfSteps--;
+  IS.stepPrev();
   animationInterval = setInterval(animation, TIME_DELTA);
   nextButton.disabled = true;
   prevButton.disabled = true;
