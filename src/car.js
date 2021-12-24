@@ -67,11 +67,11 @@ function getCarSideTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-function Text(string) {
+function Text(string, size=15) {
   // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
   const geometry = new TextGeometry(string, {
       font: font,
-      size: 10,
+      size: size,
       height: 1,
       curveSegments: 10,
       bevelEnabled: false,
