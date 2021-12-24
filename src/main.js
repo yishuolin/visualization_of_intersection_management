@@ -160,6 +160,8 @@ renderer.setSize(Intersection.offsetWidth, Intersection.offsetWidth);
 if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
 const controls = new OrbitControls( camera, renderer.domElement );
+controls.maxPolarAngle = Math.PI/3;
+controls.minPolarAngle = 0;
 
 function reset() {
   IS.randomGraph(6, 2);
