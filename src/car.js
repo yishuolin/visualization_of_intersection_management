@@ -139,7 +139,7 @@ const addDetailedTexture = (car) => {
   car.add(frontWheel);
 
   const text = new Text(String(car.carId));
-  text.position.z = 40;
+  text.position.z = 35;
   text.position.x = -5;
   text.rotation.z = -Math.PI / 2;
   car.add(text);
