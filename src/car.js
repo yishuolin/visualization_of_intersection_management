@@ -1,6 +1,8 @@
 import {getPaths} from './road';
 import {CAR_HEIGHT, CAR_WIDTH, CAR_LENGTH} from './constants';
 import {getRotationZ, getRandomColor} from './utils';
+import {font} from './font'
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry'
 const showTexture = true;
 
 function Car(config) {
@@ -17,10 +19,6 @@ function Car(config) {
   main.receiveShadow = true;
   car.add(main);
 
-  if (showTexture) {
-    addDetailedTexture(car);
-  }
-
   car.carId = config.carId;
   car.zones = config.zones;
   car.position.x = config.position.x;
@@ -30,6 +28,10 @@ function Car(config) {
   car.stage = config.stage;
   car.paths = getPaths(car, config.trajectory);
   car.mesh = main;
+
+  if (showTexture) {
+    addDetailedTexture(car);
+  }
 
   return car;
 }
@@ -63,6 +65,29 @@ function getCarSideTexture() {
   context.fillRect(58, 8, 60, 24);
 
   return new THREE.CanvasTexture(canvas);
+}
+
+function Text(string) {
+  // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
+  const geometry = new TextGeometry(string, {
+      font: font,
+      size: 10,
+      height: 1,
+      curveSegments: 10,
+      bevelEnabled: false,
+      bevelOffset: 0,
+      bevelSegments: 1,
+      bevelSize: 0.3,
+      bevelThickness: 1
+  }).center();
+  const materials = [
+      new THREE.MeshPhongMaterial({ color: 0x000000 }), // front
+      new THREE.MeshPhongMaterial({ color: 0x000000 }) // side
+  ];
+  const textMesh = new THREE.Mesh(geometry, materials);
+  // textMesh.castShadow = true
+
+  return textMesh;
 }
 
 function Wheel() {
@@ -110,6 +135,12 @@ const addDetailedTexture = (car) => {
   const frontWheel = new Wheel();
   frontWheel.position.x = 18;
   car.add(frontWheel);
+
+  const text = new Text(String(car.carId));
+  text.position.z = 40;
+  text.position.x = -5;
+  text.rotation.z = -Math.PI/2;
+  car.add(text);
 };
 
 export {Car};
