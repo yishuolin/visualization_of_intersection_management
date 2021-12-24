@@ -67,7 +67,7 @@ export default class extends IntersectionManagement {
         return this.carPaths;
     }
 
-    stepNext() {
+    stepNext(tryBest = true) {
         if (this.prevNodes.length > this.nPrev) {
             this.prevNodes.shift();
             this.prevNodes.push(this.timingConflictGraph.elements('.cy-node-current'));
@@ -97,7 +97,44 @@ export default class extends IntersectionManagement {
                 nextNode.addClass(['cy-node-current']);
             }
         });
-        return movableNodes.map((d)=>d.data('car'));
+        let movedOnce = movableNodes.map((d)=>d.data('car'));
+        if (tryBest) {
+            let flag = false;
+            do {
+                flag = false;
+                let movableNodes = this._getZeroIncomerNodes();
+                movableNodes.forEach((node) => {
+                    // TODO: check if the node meet the end condition
+                    if (movedOnce.includes(node.data('car')))
+                        return;
+                    else {
+                        flag = true;
+                        movedOnce.push(node.data('car'));
+                    }
+                    node.removeClass(['cy-node-current']);
+                    node.addClass(['cy-transparent']);
+                    let outgoers = node.outgoers('edge').not('.cy-disabled');
+                    outgoers.addClass(['cy-transparent']);
+                    let nextEdge = outgoers.filter('[type = 1]')[0];
+                    if (!nextEdge) {
+                        this.carPositions[node.data('car')] = {
+                            inLane: true,
+                            position: null
+                        };
+                    }
+                    else {
+                        let nextNode = nextEdge.target();
+                        this.carPositions[node.data('car')] = {
+                            inLane: nextNode.data('inLane'),
+                            position: nextNode.data('position')
+                        };
+                        nextNode.addClass(['cy-node-current']);
+                    }
+                });
+            } while (flag);
+        }
+        
+        return movedOnce;
     }
     stepPrev() {
         let prevNodes = this.prevNodes.pop();
