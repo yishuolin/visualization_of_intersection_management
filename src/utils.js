@@ -1,4 +1,4 @@
-import {LANE_1, LANE_2, LANE_3, LANE_4} from './constants';
+import {LANE_1, LANE_2, LANE_3, LANE_4, CAR_LENGTH, nZones} from './constants';
 
 function Stack() {
   const items = [];
@@ -38,4 +38,37 @@ const getRandomColor = () => {
   return color;
 };
 
-export {Stack, getRotationZ, getRandomColor};
+const laneAdapter = {
+  'lane_-1': LANE_2,
+  'lane_-2': LANE_1,
+  'lane_-3': LANE_4,
+  'lane_-4': LANE_3,
+};
+
+const getInitialPosition = {
+  [LANE_1]: (car) => ({
+    x:
+      -window.intersectionArea.width / nZones -
+      CAR_LENGTH * (car.order * 2 - 1),
+    y: -window.intersectionArea.height / nZones / 2,
+  }),
+  [LANE_2]: (car) => ({
+    x:
+      window.intersectionArea.width / nZones + CAR_LENGTH * (car.order * 2 - 1),
+    y: window.intersectionArea.height / nZones / 2,
+  }),
+  [LANE_3]: (car) => ({
+    x: -window.intersectionArea.width / nZones / 2,
+    y:
+      window.intersectionArea.height / nZones +
+      CAR_LENGTH * (car.order * 2 - 1),
+  }),
+  [LANE_4]: (car) => ({
+    x: window.intersectionArea.width / nZones / 2,
+    y:
+      -window.intersectionArea.height / nZones -
+      CAR_LENGTH * (car.order * 2 - 1),
+  }),
+};
+
+export {Stack, getRotationZ, getRandomColor, laneAdapter, getInitialPosition};
