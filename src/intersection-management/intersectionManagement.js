@@ -7,7 +7,7 @@ cytoscape.use( d3Force );
 
 export default class {
   constructor() {
-    this.maxLeaveOrder = 5;
+    this.maxLeaveOrder = 7;
     this.nCars = undefined;
     this.maxLaneCars = undefined;
     this.carPaths = undefined;

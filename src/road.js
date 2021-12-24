@@ -9,14 +9,22 @@ import {
   TURN_RIGHT,
   GO_STRAIGHT,
   CAR_LENGTH,
+  STUFF_NUM,
+  SCENE_WIDTH,
+  SCENE_HEIGHT
 } from './constants';
 import {getRotationZ} from './utils';
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry";
+import { ModelManager } from './modelManager';
+import { randomStuff } from './randomStuff';
 
 const RADIAN_90 = Math.PI / 2;
 const RADIAN_180 = Math.PI;
 const RADIAN_270 = Math.PI * 1.5;
 const RADIAN_315 = Math.PI * 1.75;
 const RADIAN_360 = Math.PI * 2;
+
+const modelManager = new ModelManager();
 
 function getCircle(x1, y1, r, theta_start, theta_end) {
   const points = [];
@@ -45,6 +53,7 @@ function getLine(x1, y1, x2, y2) {
 }
 
 function getRoad(mapWidth, mapHeight, nZones) {
+  const road = new THREE.Group();
   const lineMarkingsTexture = getLineMarkings(
     mapWidth,
     mapHeight,
@@ -52,7 +61,7 @@ function getRoad(mapWidth, mapHeight, nZones) {
     nZones,
   );
 
-  const planeGeometry = new THREE.PlaneBufferGeometry(mapWidth, mapHeight);
+  const planeGeometry = new THREE.PlaneBufferGeometry(SCENE_WIDTH, SCENE_HEIGHT);
   const planeMaterial = new THREE.MeshLambertMaterial({
     map: lineMarkingsTexture,
   });
@@ -60,7 +69,12 @@ function getRoad(mapWidth, mapHeight, nZones) {
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.receiveShadow = true;
   plane.matrixAutoUpdate = false;
-  return plane;
+  road.add(plane);
+
+  const blocks = getBlocks(2000);
+  road.add(blocks);
+
+  return road;
 }
 
 function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
@@ -69,20 +83,20 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
     height: mapHeight * intersectionAreaSize,
   };
   const intersectionAreaStart = {
-    x: mapWidth / 2 - intersectionArea.width / 2,
-    y: mapHeight / 2 - intersectionArea.height / 2,
+    x: SCENE_WIDTH / 2 - intersectionArea.width / 2,
+    y: SCENE_HEIGHT / 2 - intersectionArea.height / 2,
   };
   const intersectionAreaEnd = {
-    x: mapWidth / 2 + intersectionArea.width / 2,
-    y: mapHeight / 2 + intersectionArea.height / 2,
+    x: SCENE_WIDTH / 2 + intersectionArea.width / 2,
+    y: SCENE_HEIGHT / 2 + intersectionArea.height / 2,
   };
   const canvas = document.createElement('canvas');
-  canvas.width = mapWidth;
-  canvas.height = mapHeight;
+  canvas.width = SCENE_WIDTH;
+  canvas.height = SCENE_HEIGHT;
   const context = canvas.getContext('2d');
 
   context.fillStyle = TRACK_COLOR;
-  context.fillRect(0, 0, mapWidth, mapHeight);
+  context.fillRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
 
   context.lineWidth = BARRIER_LINE_WIDTH;
   context.strokeStyle = BARRIER_LINE_COLOR;
@@ -90,18 +104,19 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
 
   // vertical line
   context.beginPath();
-  context.moveTo(mapWidth / 2, 0);
-  context.lineTo(mapWidth / 2, intersectionAreaStart.y);
-  context.moveTo(mapWidth / 2, intersectionAreaEnd.y);
-  context.lineTo(mapWidth / 2, mapHeight);
+  // console.log(SCENE_WIDTH)
+  context.moveTo(SCENE_WIDTH/2, 0);
+  context.lineTo(SCENE_WIDTH/2, intersectionAreaStart.y);
+  context.moveTo(SCENE_WIDTH/2, intersectionAreaEnd.y);
+  context.lineTo(SCENE_WIDTH/2, SCENE_HEIGHT);
   context.stroke();
 
   // horizontal line
   context.beginPath();
-  context.moveTo(0, mapHeight / 2);
-  context.lineTo(intersectionAreaStart.x, mapHeight / 2);
-  context.moveTo(intersectionAreaEnd.x, mapHeight / 2);
-  context.lineTo(mapWidth, mapHeight / 2);
+  context.moveTo(0, SCENE_HEIGHT / 2);
+  context.lineTo(intersectionAreaStart.x, SCENE_HEIGHT / 2);
+  context.moveTo(intersectionAreaEnd.x, SCENE_HEIGHT / 2);
+  context.lineTo(SCENE_WIDTH, SCENE_HEIGHT / 2);
   context.stroke();
 
   // draw conflict zones
@@ -136,6 +151,37 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
   }
 
   return new THREE.CanvasTexture(canvas);
+}
+
+function getBlocks() {
+  const blocks = new THREE.Group();
+  const blockSizeW = SCENE_WIDTH/2 - gridWidth;
+  const blockSizeH = SCENE_HEIGHT/2 - gridHeight;
+  for (let index = 0; index < 4; index++) {
+    let block = new THREE.Group();
+    let geometry = new RoundedBoxGeometry(blockSizeW, blockSizeH, 100, 5, 100);
+    let material = new THREE.MeshLambertMaterial({color: 0x00cc00});
+    block.add(new THREE.Mesh( geometry, material ));
+    let stuffs = randomStuff(blockSizeW*0.9, blockSizeH*0.9, block, STUFF_NUM);
+    stuffs.forEach(stuff => modelManager.add(...stuff));
+    switch (index) {
+      case 0: 
+        block.position.set(-gridWidth-blockSizeW/2, gridHeight+blockSizeH/2, -20);
+        break;
+      case 1:
+        block.position.set(gridWidth+blockSizeW/2, gridHeight+blockSizeH/2, -20);
+        break;
+      case 2:
+        block.position.set(-gridWidth-blockSizeW/2, -gridHeight-blockSizeH/2, -20);
+        break;
+      case 3:
+        block.position.set(gridWidth+blockSizeW/2, -gridHeight-blockSizeH/2, -20);
+        break;
+    }
+    blocks.add(block);
+  }
+  modelManager.load();
+  return blocks;
 }
 
 const getPreTurnLeft = () => {

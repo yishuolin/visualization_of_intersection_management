@@ -33,8 +33,15 @@ const TURN_LEFT = 'turn_left';
 const TURN_RIGHT = 'turn_right';
 const GO_STRAIGHT = 'go_straight';
 
+// block
+const STUFF_NUM = 20;
+
 // simulation
 const MAX_PREV_STEPS = 500; // TODO: drop the contraint or add the contraint to visualization
+
+// scene
+const SCENE_WIDTH = 4000;
+const SCENE_HEIGHT = 4000;
 
 export {
   nZones,
@@ -64,4 +71,7 @@ export {
   TURN_RIGHT,
   GO_STRAIGHT,
   MAX_PREV_STEPS,
+  STUFF_NUM,
+  SCENE_WIDTH,
+  SCENE_HEIGHT,
 };

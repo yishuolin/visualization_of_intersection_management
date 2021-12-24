@@ -9,8 +9,8 @@ const camera = new THREE.OrthographicCamera(
   cameraWidth / 2, // right
   cameraHeight / 2, // top
   cameraHeight / -2, // bottom
-  50, // near plane
-  700, // far plane
+  -2000, // near plane
+  2000, // far plane
 );
 
 camera.position.set(0, -150, 300);

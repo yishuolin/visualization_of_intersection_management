@@ -10,23 +10,23 @@ import {
 const getNewPoint = (car, lastPoint) => {
   const laneSwitch = {
     [LANE_1]: new THREE.Vector3(
-      lastPoint.x + CAR_LENGTH,
+      lastPoint.x + CAR_LENGTH * 4,
       lastPoint.y,
       lastPoint.z,
     ),
     [LANE_2]: new THREE.Vector3(
-      lastPoint.x - CAR_LENGTH,
+      lastPoint.x - CAR_LENGTH * 4,
       lastPoint.y,
       lastPoint.z,
     ),
     [LANE_3]: new THREE.Vector3(
       lastPoint.x,
-      lastPoint.y - CAR_LENGTH,
+      lastPoint.y - CAR_LENGTH * 4,
       lastPoint.z,
     ),
     [LANE_4]: new THREE.Vector3(
       lastPoint.x,
-      lastPoint.y + CAR_LENGTH,
+      lastPoint.y + CAR_LENGTH * 4,
       lastPoint.z,
     ),
   };
