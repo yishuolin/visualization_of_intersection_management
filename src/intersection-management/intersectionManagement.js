@@ -3,7 +3,7 @@ import cycss from './cycss.txt';
 import d3Force from 'cytoscape-d3-force';
 import pathPicker4 from './pathPicker4.js';
 import conflictZonePath4 from './conflictZonePath4.js';
-cytoscape.use( d3Force );
+cytoscape.use(d3Force);
 
 export default class {
   constructor() {
@@ -13,36 +13,44 @@ export default class {
     this.carPaths = undefined;
     this.laneSize = undefined;
     this.timingConflictGraph = cytoscape({
-        container: document.getElementById('cy'),
-        wheelSensitivity: 0.1,
-        style: cycss
+      container: document.getElementById('cy'),
+      wheelSensitivity: 0.1,
+      style: cycss,
     });
-    this.timingConflictGraph.style().selector('node').style('label', (node) => {
-      let [car, type, xy] = node.data('id').split(':');
-      let str = `car: ${car}\n`;
-      if (type == "l") {
-        let [x, y] = xy.substr(1, xy.length-2).split(',');
-        str += `lane: ${x.split('_')[1]}\n`;
-        str += `order: ${y}`;
-      }
-      else {
-        str += `zone: ${xy}`;
-      }
-      console.log(node.data('id').split(':'));
-      return str;
-    }).update();
+    this.timingConflictGraph
+      .style()
+      .selector('node')
+      .style('label', (node) => {
+        let [car, type, xy] = node.data('id').split(':');
+        let str = `car: ${car}\n`;
+        if (type == 'l') {
+          let [x, y] = xy.substr(1, xy.length - 2).split(',');
+          str += `lane: ${x.split('_')[1]}\n`;
+          str += `order: ${y}`;
+        } else {
+          str += `zone: ${xy}`;
+        }
+        // console.log(node.data('id').split(':'));
+        return str;
+      })
+      .update();
   }
-  
+
   _layoutGraph() {
-    this.timingConflictGraph.elements(':visible').layout({
+    this.timingConflictGraph
+      .elements(':visible')
+      .layout({
         name: 'd3-force',
-        linkId: function id(d) { return d.id; },
+        linkId: function id(d) {
+          return d.id;
+        },
         collideRadius: 50,
         collideStrength: 1,
         manyBodyStrength: -300,
         linkDistance: 100,
-        infinite: true
-    }).run();
+        infinite: true,
+      })
+      .run();
   }
 
   randomGraph(nCars = 6, maxLaneCars = 3) {
@@ -56,7 +64,7 @@ export default class {
     this._generateGraph();
     this._layoutGraph();
   }
-  
+
   userGraph(yaml) {
     this.timingConflictGraph.elements().remove();
     // TODO: parse yaml to get nCars, maxLaneCars, carPaths
@@ -69,20 +77,16 @@ export default class {
     let tempLane = {};
     let tempZone = {};
     let addLaneData = (lane, order, data) => {
-      if (tempLane[lane] == undefined)
-        tempLane[lane] = {};
-      if (tempLane[lane][order] == undefined)
-        tempLane[lane][order] = [];
+      if (tempLane[lane] == undefined) tempLane[lane] = {};
+      if (tempLane[lane][order] == undefined) tempLane[lane][order] = [];
       tempLane[lane][order].push(data);
-    }
+    };
     let addZoneData = (zoneX, ZoneY, data) => {
-      if (tempZone[zoneX] == undefined)
-        tempZone[zoneX] = {};
-      if (tempZone[zoneX][ZoneY] == undefined)
-        tempZone[zoneX][ZoneY] = [];
+      if (tempZone[zoneX] == undefined) tempZone[zoneX] = {};
+      if (tempZone[zoneX][ZoneY] == undefined) tempZone[zoneX][ZoneY] = [];
       tempZone[zoneX][ZoneY].push(data);
-    }
-    
+    };
+
     for (const [car, path] of Object.entries(this.carPaths)) {
       // source lane path
       for (let order = path.order; order > 0; order--) {
@@ -92,43 +96,57 @@ export default class {
             id: `${car}:l:[${path.lane},${order}]`,
             car: car,
             inLane: true,
-            position: [path.lane, order]
-          }
-        })
+            position: [path.lane, order],
+          },
+        });
         addLaneData(path.lane, order, {car: car, lane: path.lane});
       }
       for (let order = path.order; order > 1; order--) {
         this.timingConflictGraph.add({
           group: 'edges',
           data: {
-            id: `${car}:l:[${path.lane},${order}]_${car}:l:[${path.lane},${order-1}]`,
+            id: `${car}:l:[${path.lane},${order}]_${car}:l:[${path.lane},${
+              order - 1
+            }]`,
             source: `${car}:l:[${path.lane},${order}]`,
-            target: `${car}:l:[${path.lane},${order-1}]`,
+            target: `${car}:l:[${path.lane},${order - 1}]`,
             inLane: true,
-            type: 1
+            type: 1,
           },
-          classes: 'cy-edge-type1'
-        })
+          classes: 'cy-edge-type1',
+        });
       }
 
       // conflict zone path
-      for (let index = 0; index < conflictZonePath4[path.lane][path.direction].length; index++) {
+      for (
+        let index = 0;
+        index < conflictZonePath4[path.lane][path.direction].length;
+        index++
+      ) {
         const currentZone = conflictZonePath4[path.lane][path.direction][index];
-        
+
         this.timingConflictGraph.add({
           group: 'nodes',
           data: {
             id: `${car}:c:[${currentZone[0]},${currentZone[1]}]`,
             car: car,
             inLane: false,
-            position: currentZone
-          }
-        })
-        addZoneData(currentZone[0], currentZone[1], {car: car, lane: path.lane});
+            position: currentZone,
+          },
+        });
+        addZoneData(currentZone[0], currentZone[1], {
+          car: car,
+          lane: path.lane,
+        });
       }
-      for (let index = 0; index < conflictZonePath4[path.lane][path.direction].length-1; index++) {
+      for (
+        let index = 0;
+        index < conflictZonePath4[path.lane][path.direction].length - 1;
+        index++
+      ) {
         const currentZone = conflictZonePath4[path.lane][path.direction][index];
-        const nextZone = conflictZonePath4[path.lane][path.direction][index+1];
+        const nextZone =
+          conflictZonePath4[path.lane][path.direction][index + 1];
 
         this.timingConflictGraph.add({
           group: 'edges',
@@ -137,10 +155,10 @@ export default class {
             source: `${car}:c:[${currentZone[0]},${currentZone[1]}]`,
             target: `${car}:c:[${nextZone[0]},${nextZone[1]}]`,
             inLane: false,
-            type: 1
+            type: 1,
           },
-          classes: 'cy-edge-type1'
-        })
+          classes: 'cy-edge-type1',
+        });
       }
 
       // target lane path
@@ -151,25 +169,27 @@ export default class {
             id: `${car}:l:[${path.targetLane},${order}]`,
             car: car,
             inLane: true,
-            position: [path.targetLane, order]
-          }
-        })
-        
+            position: [path.targetLane, order],
+          },
+        });
+
         addLaneData(path.targetLane, order, {car: car, lane: path.lane});
       }
-      
-      for (let order = 1; order <= this.maxLeaveOrder-1; order++) {
+
+      for (let order = 1; order <= this.maxLeaveOrder - 1; order++) {
         this.timingConflictGraph.add({
           group: 'edges',
           data: {
-            id: `${car}:l:[${path.targetLane},${order}]_${car}:l:[${path.targetLane},${order+1}]`,
+            id: `${car}:l:[${path.targetLane},${order}]_${car}:l:[${
+              path.targetLane
+            },${order + 1}]`,
             source: `${car}:l:[${path.targetLane},${order}]`,
-            target: `${car}:l:[${path.targetLane},${order+1}]`,
+            target: `${car}:l:[${path.targetLane},${order + 1}]`,
             inLane: true,
-            type: 1
+            type: 1,
           },
-          classes: 'cy-edge-type1'
-        })
+          classes: 'cy-edge-type1',
+        });
       }
 
       // source lane to conflict zone edge
@@ -181,34 +201,37 @@ export default class {
           source: `${car}:l:[${path.lane},1]`,
           target: `${car}:c:[${firstZone[0]},${firstZone[1]}]`,
           inLane: true,
-          type: 1
+          type: 1,
         },
-        classes: 'cy-edge-type1'
-      })
-      
+        classes: 'cy-edge-type1',
+      });
+
       // conflict zone to target lane edge
-      let lastZone = conflictZonePath4[path.lane][path.direction][conflictZonePath4[path.lane][path.direction].length-1];
+      let lastZone =
+        conflictZonePath4[path.lane][path.direction][
+          conflictZonePath4[path.lane][path.direction].length - 1
+        ];
       this.timingConflictGraph.add({
         group: 'edges',
-          data: {
-            id: `${car}:c:[${lastZone[0]},${lastZone[1]}]_${car}:l:[${path.targetLane},1]`,
-            source: `${car}:c:[${lastZone[0]},${lastZone[1]}]`,
-            target: `${car}:l:[${path.targetLane},1]`,
-            inLane: true,
-            type: 1
-          },
-          classes: 'cy-edge-type1'
-      })
+        data: {
+          id: `${car}:c:[${lastZone[0]},${lastZone[1]}]_${car}:l:[${path.targetLane},1]`,
+          source: `${car}:c:[${lastZone[0]},${lastZone[1]}]`,
+          target: `${car}:l:[${path.targetLane},1]`,
+          inLane: true,
+          type: 1,
+        },
+        classes: 'cy-edge-type1',
+      });
     }
-    
+
     // generate type-2 edges
     // lanes
     for (const [lane, orders] of Object.entries(tempLane)) {
       for (const [order, cars] of Object.entries(orders)) {
-        let sortedcars = cars.sort( (a, b) => a.car > b.car );
-        
+        let sortedcars = cars.sort((a, b) => a.car > b.car);
+
         for (let index = 0; index < sortedcars.length; index++) {
-          for (let index2 = index+1; index2 < sortedcars.length; index2++) {
+          for (let index2 = index + 1; index2 < sortedcars.length; index2++) {
             const car = sortedcars[index];
             const nextCar = sortedcars[index2];
             if (car.lane == nextCar.lane) {
@@ -219,10 +242,10 @@ export default class {
                   source: `${car.car}:l:[${lane},${order}]`,
                   target: `${nextCar.car}:l:[${lane},${order}]`,
                   inLane: true,
-                  type: 2
+                  type: 2,
                 },
-                classes: 'cy-edge-type2'
-              })
+                classes: 'cy-edge-type2',
+              });
             }
           }
         }
@@ -231,9 +254,9 @@ export default class {
     // conflict zones
     for (const [zoneX, zoneYs] of Object.entries(tempZone)) {
       for (const [zoneY, cars] of Object.entries(zoneYs)) {
-        let sortedcars = cars.sort( (a, b) => a.car > b.car );
+        let sortedcars = cars.sort((a, b) => a.car > b.car);
         for (let index = 0; index < sortedcars.length; index++) {
-          for (let index2 = index+1; index2 < sortedcars.length; index2++) {
+          for (let index2 = index + 1; index2 < sortedcars.length; index2++) {
             const car = sortedcars[index];
             const nextCar = sortedcars[index2];
             if (car.lane == nextCar.lane) {
@@ -244,12 +267,11 @@ export default class {
                   source: `${car.car}:c:[${zoneX},${zoneY}]`,
                   target: `${nextCar.car}:c:[${zoneX},${zoneY}]`,
                   inLane: false,
-                  type: 2
+                  type: 2,
                 },
-                classes: 'cy-edge-type2'
-              })
-            }
-            else {
+                classes: 'cy-edge-type2',
+              });
+            } else {
               this.timingConflictGraph.add({
                 group: 'edges',
                 data: {
@@ -257,10 +279,10 @@ export default class {
                   source: `${nextCar.car}:c:[${zoneX},${zoneY}]`,
                   target: `${car.car}:c:[${zoneX},${zoneY}]`,
                   inLane: false,
-                  type: 3
+                  type: 3,
                 },
-                classes: 'cy-edge-type3'
-              })
+                classes: 'cy-edge-type3',
+              });
               this.timingConflictGraph.add({
                 group: 'edges',
                 data: {
@@ -268,10 +290,10 @@ export default class {
                   source: `${car.car}:c:[${zoneX},${zoneY}]`,
                   target: `${nextCar.car}:c:[${zoneX},${zoneY}]`,
                   inLane: false,
-                  type: 3
+                  type: 3,
                 },
-                classes: 'cy-edge-type3'
-              })
+                classes: 'cy-edge-type3',
+              });
             }
           }
         }
@@ -279,12 +301,15 @@ export default class {
     }
   }
   showOnlyZones() {
-    this.timingConflictGraph.elements('[?inLane]').style('visibility', 'hidden');
+    this.timingConflictGraph
+      .elements('[?inLane]')
+      .style('visibility', 'hidden');
     this._layoutGraph();
   }
   showFull() {
-    this.timingConflictGraph.elements('[?inLane]').style('visibility', 'visible');
+    this.timingConflictGraph
+      .elements('[?inLane]')
+      .style('visibility', 'visible');
     this._layoutGraph();
   }
-
 }
