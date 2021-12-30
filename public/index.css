@@ -19,11 +19,13 @@ body {
   border-left: 3px solid black;
   overflow-y: hidden;
 }
-#cy,
+/* #cy,
 #resource-conflict-graph {
   height: 55vh;
-}
+} */
 #cy {
+  height: 100vh;
+  overflow-x: hidden;
   border-bottom: 2px solid black;
 }
 #bottom-buttons {

@@ -16,8 +16,8 @@ document.getElementById('checkCycle').onclick = (e) =>
 document.getElementById('reset').onclick = (e) => console.log(IS.reset());
 document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
 document.getElementById('showFull').onclick = (e) => IS.showFull();
-document.getElementById('stepNext').onclick = (e) => console.log(IS.stepNext());
-document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
+// document.getElementById('stepNext').onclick = (e) => console.log(IS.stepNext());
+// document.getElementById('stepPrev').onclick = (e) => IS.stepPrev();
 
 const Intersection = document.getElementById('intersection');
 
@@ -73,7 +73,7 @@ controls.maxZoom = 3;
 controls.minZoom = 0.6;
 
 function reset() {
-  IS.randomGraph(6, 4);
+  IS.randomGraph(4, 2);
   getCarsConfig(IS.reset());
 }
 reset();
