@@ -10,6 +10,8 @@
 
 <body>
   <script src="three.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
+  </script>
   <div id="top-buttons">
     <span>Auto</span>
     <label class="switch">
@@ -28,6 +30,20 @@
     </div>
   </div>
   <div id="bottom-buttons">
+    <div>
+      <div>
+        <label>
+          Total Cars:
+          <input id="total-cars" type="number" value="4">
+        </label>
+      </div>
+      <div>
+        <label>
+          Maximum Cars Per Lane:
+          <input id="max-cars-per-lane" type="number" value="2">
+        </label>
+      </div>
+    </div>
     <button id="randCars">Generate Random Cars</button>
     <button id="randSol">Pick Random Solution</button>
     <button id="checkCycle">Check Cycle</button>

@@ -6,7 +6,7 @@ const showTexture = true;
 function Car(config) {
   const car = new THREE.Group();
 
-  const color = getRandomColor();
+  const color = getRandomColor(config.carId);
   const main = new THREE.Mesh(
     new THREE.BoxBufferGeometry(CAR_LENGTH, CAR_WIDTH, CAR_HEIGHT),
     new THREE.MeshLambertMaterial({color}),

@@ -115,3 +115,7 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
