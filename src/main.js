@@ -1,11 +1,11 @@
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {ambientLight, dirLight} from './light';
 import {camera} from './camera';
-import {getRoad, getBlocks} from './road';
+import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
 import {Stack, laneAdapter, getInitialPosition} from './utils';
-import {nZones, FRAME_TIME, FPS, MAX_PREV_STEPS, STUFF_NUM} from './constants';
+import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
@@ -13,7 +13,7 @@ document.getElementById('randCars').onclick = (e) => IS.randomGraph(6, 2);
 document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = (e) =>
   console.log(IS.isCycleExist(true));
-document.getElementById('reset').onclick = (e) => console.log(IS.reset());
+document.getElementById('reset').onclick = reset;
 document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
 document.getElementById('showFull').onclick = (e) => IS.showFull();
 
@@ -23,7 +23,6 @@ const showShadows = true;
 
 const scene = new THREE.Scene();
 
-// scene.add(getRoad(cameraWidth, cameraHeight * 2, nZones)); // Original Code: The map height is higher because we look at the map from an angle
 scene.add(
   getRoad(
     Intersection.offsetHeight * 2.5,
@@ -40,40 +39,31 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: 'high-performance',
 });
-
-let carsConfig = [];
-
-const getCarsConfig = (cars) => {
-  for (let key in cars) {
-    if (cars.hasOwnProperty(key)) {
-      let car = cars[key];
-      carsConfig.push({
-        carId: parseInt(key),
-        trajectory: car.direction,
-        onLane: car.lane,
-        stage: 0,
-        position: getInitialPosition[car.lane](car),
-        targetLane: laneAdapter[car.targetLane],
-        order: car.order,
-      });
-    }
-  }
-};
-
 renderer.setSize(Intersection.offsetWidth, Intersection.offsetHeight);
 if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
+
+const getCarsConfig = (cars) =>
+  Object.keys(cars).map((key) => {
+    const car = cars[key];
+    return {
+      carId: parseInt(key),
+      trajectory: car.direction,
+      onLane: car.lane,
+      stage: 0,
+      position: getInitialPosition[car.lane](car),
+      targetLane: laneAdapter[car.targetLane],
+      order: car.order,
+    };
+  });
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.maxPolarAngle = Math.PI / 3;
 controls.minPolarAngle = 0;
 controls.maxZoom = 3;
 controls.minZoom = 0.6;
 
-function reset() {
-  IS.randomGraph(4, 2);
-  getCarsConfig(IS.reset());
-}
-reset();
+let cars = [];
 
 const addCar = (scene, config) => {
   const car = Car(config);
@@ -81,17 +71,28 @@ const addCar = (scene, config) => {
   return car;
 };
 
-const cars = carsConfig.map((config) => {
-  const car = addCar(scene, config);
-  return car;
-});
-renderer.render(scene, camera);
+function reset() {
+  IS.randomGraph(4, 2);
+
+  // remove cars from scene
+  cars.forEach((car) => {
+    scene.remove(car);
+  });
+
+  const carsConfig = getCarsConfig(IS.reset());
+  cars = carsConfig.map((config) => {
+    const car = addCar(scene, config);
+    return car;
+  });
+
+  renderer.render(scene, camera);
+}
+reset();
 
 let autoInterval = null;
 let animationInterval = null;
 let counter = 0;
 let numOfSteps = 0;
-const TIME_DELTA = 1000 / FPS;
 let isReversed = false;
 let isAuto = false;
 
@@ -128,16 +129,17 @@ const handleNext = () => {
   nextButton.disabled = true;
   prevButton.disabled = true;
 };
-
-nextButton.addEventListener('click', handleNext);
-prevButton.addEventListener('click', () => {
+const handlePrev = () => {
   isReversed = true;
   numOfSteps--;
   IS.stepPrev();
   animationInterval = setInterval(animation, TIME_DELTA);
   nextButton.disabled = true;
   prevButton.disabled = true;
-});
+};
+
+nextButton.addEventListener('click', handleNext);
+prevButton.addEventListener('click', handlePrev);
 
 function animation() {
   counter += TIME_DELTA;
