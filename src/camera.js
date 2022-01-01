@@ -15,6 +15,6 @@ const camera = new THREE.OrthographicCamera(
 
 camera.position.set(0, -150, 300);
 camera.lookAt(0, 0, 0);
-camera.up = new THREE.Vector3(0,0,1);
+camera.up = new THREE.Vector3(0, 0, 1);
 
-export {camera, cameraWidth, cameraHeight};
+export { camera, cameraWidth, cameraHeight };

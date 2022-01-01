@@ -11,15 +11,16 @@ import {
   CAR_LENGTH,
   STUFF_NUM,
   SCENE_WIDTH,
-  SCENE_HEIGHT
+  SCENE_HEIGHT,
 } from './constants';
 import {getRotationZ} from './utils';
-import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry";
-import { ModelManager } from './modelManager';
-import { randomStuff } from './randomStuff';
+import {RoundedBoxGeometry} from 'three/examples/jsm/geometries/RoundedBoxGeometry';
+import {font} from './font';
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
+import {ModelManager} from './modelManager';
+import {randomStuff} from './randomStuff';
 
 const RADIAN_90 = Math.PI / 2;
-const RADIAN_180 = Math.PI;
 const RADIAN_270 = Math.PI * 1.5;
 const RADIAN_315 = Math.PI * 1.75;
 const RADIAN_360 = Math.PI * 2;
@@ -52,6 +53,23 @@ function getLine(x1, y1, x2, y2) {
   return new THREE.CatmullRomCurve3(points);
 }
 
+function getIndices() {
+  // TODO: refactor
+  const text_00 = new Text('(0, 0)', 20);
+  text_00.position.x = -40;
+  text_00.position.y = -gridHeight + 30;
+  const text_01 = new Text('(0, 1)', 20);
+  text_01.position.x = -40;
+  text_01.position.y = 30;
+  const text_10 = new Text('(1, 0)', 20);
+  text_10.position.x = -40 + gridWidth;
+  text_10.position.y = -gridHeight + 30;
+  const text_11 = new Text('(1, 1)', 20);
+  text_11.position.x = -40 + gridWidth;
+  text_11.position.y = 30;
+  return [text_00, text_01, text_10, text_11];
+}
+
 function getRoad(mapWidth, mapHeight, nZones) {
   const road = new THREE.Group();
   const lineMarkingsTexture = getLineMarkings(
@@ -61,7 +79,10 @@ function getRoad(mapWidth, mapHeight, nZones) {
     nZones,
   );
 
-  const planeGeometry = new THREE.PlaneBufferGeometry(SCENE_WIDTH, SCENE_HEIGHT);
+  const planeGeometry = new THREE.PlaneBufferGeometry(
+    SCENE_WIDTH,
+    SCENE_HEIGHT,
+  );
   const planeMaterial = new THREE.MeshLambertMaterial({
     map: lineMarkingsTexture,
   });
@@ -73,6 +94,10 @@ function getRoad(mapWidth, mapHeight, nZones) {
 
   const blocks = getBlocks(2000);
   road.add(blocks);
+
+  getIndices().forEach((index) => {
+    road.add(index);
+  });
 
   return road;
 }
@@ -104,11 +129,10 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
 
   // vertical line
   context.beginPath();
-  // console.log(SCENE_WIDTH)
-  context.moveTo(SCENE_WIDTH/2, 0);
-  context.lineTo(SCENE_WIDTH/2, intersectionAreaStart.y);
-  context.moveTo(SCENE_WIDTH/2, intersectionAreaEnd.y);
-  context.lineTo(SCENE_WIDTH/2, SCENE_HEIGHT);
+  context.moveTo(SCENE_WIDTH / 2, 0);
+  context.lineTo(SCENE_WIDTH / 2, intersectionAreaStart.y);
+  context.moveTo(SCENE_WIDTH / 2, intersectionAreaEnd.y);
+  context.lineTo(SCENE_WIDTH / 2, SCENE_HEIGHT);
   context.stroke();
 
   // horizontal line
@@ -149,33 +173,53 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
     context.lineTo(intersectionAreaEnd.x, intersectionAreaStart.y + offsetY);
     context.stroke();
   }
-
   return new THREE.CanvasTexture(canvas);
 }
 
 function getBlocks() {
   const blocks = new THREE.Group();
-  const blockSizeW = SCENE_WIDTH/2 - gridWidth;
-  const blockSizeH = SCENE_HEIGHT/2 - gridHeight;
+  const blockSizeW = SCENE_WIDTH / 2 - gridWidth;
+  const blockSizeH = SCENE_HEIGHT / 2 - gridHeight;
   for (let index = 0; index < 4; index++) {
     let block = new THREE.Group();
     let geometry = new RoundedBoxGeometry(blockSizeW, blockSizeH, 100, 5, 100);
     let material = new THREE.MeshLambertMaterial({color: 0x00cc00});
-    block.add(new THREE.Mesh( geometry, material ));
-    let stuffs = randomStuff(blockSizeW*0.9, blockSizeH*0.9, block, STUFF_NUM);
-    stuffs.forEach(stuff => modelManager.add(...stuff));
+    block.add(new THREE.Mesh(geometry, material));
+    let stuffs = randomStuff(
+      blockSizeW * 0.9,
+      blockSizeH * 0.9,
+      block,
+      STUFF_NUM,
+    );
+    stuffs.forEach((stuff) => modelManager.add(...stuff));
     switch (index) {
-      case 0: 
-        block.position.set(-gridWidth-blockSizeW/2, gridHeight+blockSizeH/2, -20);
+      case 0:
+        block.position.set(
+          -gridWidth - blockSizeW / 2,
+          gridHeight + blockSizeH / 2,
+          -20,
+        );
         break;
       case 1:
-        block.position.set(gridWidth+blockSizeW/2, gridHeight+blockSizeH/2, -20);
+        block.position.set(
+          gridWidth + blockSizeW / 2,
+          gridHeight + blockSizeH / 2,
+          -20,
+        );
         break;
       case 2:
-        block.position.set(-gridWidth-blockSizeW/2, -gridHeight-blockSizeH/2, -20);
+        block.position.set(
+          -gridWidth - blockSizeW / 2,
+          -gridHeight - blockSizeH / 2,
+          -20,
+        );
         break;
       case 3:
-        block.position.set(gridWidth+blockSizeW/2, -gridHeight-blockSizeH/2, -20);
+        block.position.set(
+          gridWidth + blockSizeW / 2,
+          -gridHeight - blockSizeH / 2,
+          -20,
+        );
         break;
     }
     blocks.add(block);
@@ -322,5 +366,29 @@ const getPaths = (car, trajectory, order) => {
   });
   return rotatedPath;
 };
+
+// TODO: duplicated with car.js
+function Text(string, size = 15) {
+  // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
+  const geometry = new TextGeometry(string, {
+    font: font,
+    size: size,
+    height: 1,
+    curveSegments: 10,
+    bevelEnabled: false,
+    bevelOffset: 0,
+    bevelSegments: 1,
+    bevelSize: 0.3,
+    bevelThickness: 1,
+  }).center();
+  const materials = [
+    new THREE.MeshPhongMaterial({color: 0x000000}), // front
+    new THREE.MeshPhongMaterial({color: 0x000000}), // side
+  ];
+  const textMesh = new THREE.Mesh(geometry, materials);
+  // textMesh.castShadow = true
+
+  return textMesh;
+}
 
 export {getRoad, getPaths};

@@ -1,37 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Final Project</title>
-    <style></style>
-    <link rel="stylesheet" href="index.css" />
-  </head>
-  <body>
-    <script src="three.js"></script>
-    <div id="top-buttons">
-      <span>Auto</span>
-      <label class="switch">
-        <input id="auto" type="checkbox">
-        <span class="slider round"></span>
-      </label>
-      <button id="prev">Prev</button>
-      <button id="next">Next</button>
-      <span id="step">Step: 0</span>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Final Project</title>
+  <style></style>
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+  <script src="three.js"></script>
+  <div id="top-buttons">
+    <span>Auto</span>
+    <label class="switch">
+      <input id="auto" type="checkbox">
+      <span class="slider round"></span>
+    </label>
+    <button id="prev">Prev</button>
+    <button id="next">Next</button>
+    <span id="step">Step: 0</span>
+  </div>
+  <div class="container">
+    <div id="intersection"></div>
+    <div id="graph">
+      <div id="cy"></div>
+      <!-- <div id="resource-conflict-graph"></div> -->
     </div>
-    <div class="container">
-      <div id="intersection"></div>
-      <div id="graph">
-        <div id="cy"></div>
-        <!-- <div id="resource-conflict-graph"></div> -->
-      </div>
-    </div>
-    <div id="bottom-buttons">
-      <button id="randCars">Generate Random Cars</button>
-      <button id="randSol">Pick Random Solution</button>
-      <button id="checkCycle">Check Cycle</button>
-      <button id="reset">Reset</button>
-      <button id="showOnlyZones">Show Only Zones</button>
-      <button id="showFull">Show Full Graph</button>
-    </div>
-  </body>
+  </div>
+  <div id="bottom-buttons">
+    <button id="randCars">Generate Random Cars</button>
+    <button id="randSol">Pick Random Solution</button>
+    <button id="checkCycle">Check Cycle</button>
+    <button id="reset">Reset</button>
+    <button id="showOnlyZones">Show Only Zones</button>
+    <button id="showFull">Show Full Graph</button>
+  </div>
+</body>
+
 </html>

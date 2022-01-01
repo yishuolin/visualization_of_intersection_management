@@ -122,6 +122,7 @@ reset();
 const nextButton = document.getElementById('next');
 const prevButton = document.getElementById('prev');
 prevButton.disabled = true;
+// TODO: handle click autoSwitch when next/prev is clicked
 
 const getStepNext = () => {
   const next = IS.stepNext();
