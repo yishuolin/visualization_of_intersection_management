@@ -8,6 +8,7 @@ import {Stack, laneAdapter, getInitialPosition} from './utils';
 import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
+const showShadows = true;
 let autoInterval = null;
 let animationInterval = null;
 let counter = 0;
@@ -16,7 +17,7 @@ let isReversed = false;
 let isAuto = false;
 
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
-document.getElementById('randCars').onclick = (e) => IS.randomGraph(6, 2);
+document.getElementById('randCars').onclick = (e) => reset(); //IS.randomGraph(6, 2);
 document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = (e) =>
   console.log(IS.isCycleExist(true));
@@ -24,9 +25,10 @@ document.getElementById('reset').onclick = reset;
 document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
 document.getElementById('showFull').onclick = (e) => IS.showFull();
 
-const Intersection = document.getElementById('intersection');
+const totalCarsInput = document.getElementById('total-cars');
+const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');
 
-const showShadows = true;
+const Intersection = document.getElementById('intersection');
 
 const scene = new THREE.Scene();
 
@@ -94,8 +96,16 @@ autoSwitch.addEventListener('change', function () {
   }
 });
 
+const generateRandomCars = () => {
+  //  else reset();
+};
+
 function reset() {
-  IS.randomGraph(4, 2);
+  if (!totalCarsInput.value || !maxCarsPerLaneInput.value) {
+    alert('Please enter the number of cars and max cars per lane');
+    return;
+  }
+  IS.randomGraph(totalCarsInput.value, maxCarsPerLaneInput.value);
 
   // remove cars from scene
   cars.forEach((car) => {
