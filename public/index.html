@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Final Project</title>
-		<style>
-		</style>
-		<link rel="stylesheet" href="index.css">
-	</head>
-	<body>
-		<script src="three.js"></script>
+  <head>
+    <meta charset="utf-8" />
+    <title>Final Project</title>
+    <style></style>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <script src="three.js"></script>
     <div id="top-buttons">
+      <span>Auto</span>
+      <label class="switch">
+        <input id="auto" type="checkbox">
+        <span class="slider round"></span>
+      </label>
       <button id="prev">Prev</button>
       <button id="next">Next</button>
       <span id="step">Step: 0</span>
@@ -28,8 +32,6 @@
       <button id="reset">Reset</button>
       <button id="showOnlyZones">Show Only Zones</button>
       <button id="showFull">Show Full Graph</button>
-      <!-- <button id="stepNext">Step Next</button>
-      <button id="stepPrev">Step Prev</button> -->
     </div>
-	</body>
+  </body>
 </html>
