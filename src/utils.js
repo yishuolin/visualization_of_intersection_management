@@ -31,12 +31,14 @@ const getRotationZ = {
   [LANE_4]: Math.PI / 2,
 };
 
-const getRandomColor = () => {
+const getRandomColor = (id) => {
+  Math.seedrandom(id);
   const letters = '0123456789ABCDEF';
   let color = '#';
   for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+    color += letters[Math.floor(Math.random(id) * 16)];
   }
+  Math.seedrandom(); // reset seed
   return color;
 };
 

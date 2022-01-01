@@ -17,13 +17,13 @@ let isReversed = false;
 let isAuto = false;
 
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
-document.getElementById('randCars').onclick = (e) => reset(); //IS.randomGraph(6, 2);
-document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
-document.getElementById('checkCycle').onclick = (e) =>
+document.getElementById('randCars').onclick = () => generateRandomCars();
+document.getElementById('randSol').onclick = () => IS.pickRandomSolution();
+document.getElementById('checkCycle').onclick = () =>
   console.log(IS.isCycleExist(true));
-document.getElementById('reset').onclick = reset;
-document.getElementById('showOnlyZones').onclick = (e) => IS.showOnlyZones();
-document.getElementById('showFull').onclick = (e) => IS.showFull();
+document.getElementById('reset').onclick = () => reset();
+document.getElementById('showOnlyZones').onclick = () => IS.showOnlyZones();
+document.getElementById('showFull').onclick = () => IS.showFull();
 
 const totalCarsInput = document.getElementById('total-cars');
 const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');
@@ -74,12 +74,6 @@ controls.minZoom = 0.6;
 
 let cars = [];
 
-const addCar = (scene, config) => {
-  const car = Car(config);
-  scene.add(car);
-  return car;
-};
-
 const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
   if (this.checked) {
@@ -96,17 +90,20 @@ autoSwitch.addEventListener('change', function () {
   }
 });
 
-const generateRandomCars = () => {
-  //  else reset();
+const start = () => {
+  IS.randomGraph(totalCarsInput.value, maxCarsPerLaneInput.value);
+  reset();
 };
 
-function reset() {
+function generateRandomCars() {
   if (!totalCarsInput.value || !maxCarsPerLaneInput.value) {
     alert('Please enter the number of cars and max cars per lane');
     return;
   }
-  IS.randomGraph(totalCarsInput.value, maxCarsPerLaneInput.value);
+  start();
+}
 
+function reset() {
   // remove cars from scene
   cars.forEach((car) => {
     scene.remove(car);
@@ -114,6 +111,7 @@ function reset() {
 
   // reset variables
   numOfSteps = 0;
+  document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
   isReversed = false;
   if (isAuto) {
     autoSwitch.click();
@@ -121,13 +119,15 @@ function reset() {
 
   const carsConfig = getCarsConfig(IS.reset());
   cars = carsConfig.map((config) => {
-    const car = addCar(scene, config);
+    const car = Car(config);
+    scene.add(car);
     return car;
   });
 
   renderer.render(scene, camera);
 }
-reset();
+
+start();
 
 const nextButton = document.getElementById('next');
 const prevButton = document.getElementById('prev');
