@@ -8,6 +8,13 @@ import {Stack, laneAdapter, getInitialPosition} from './utils';
 import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
+let autoInterval = null;
+let animationInterval = null;
+let counter = 0;
+let numOfSteps = 0;
+let isReversed = false;
+let isAuto = false;
+
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
 document.getElementById('randCars').onclick = (e) => IS.randomGraph(6, 2);
 document.getElementById('randSol').onclick = (e) => IS.pickRandomSolution();
@@ -71,6 +78,22 @@ const addCar = (scene, config) => {
   return car;
 };
 
+const autoSwitch = document.getElementById('auto');
+autoSwitch.addEventListener('change', function () {
+  if (this.checked) {
+    isAuto = true;
+    document.getElementById('reset').disabled = true;
+    handleNext();
+    autoInterval = setInterval(() => {
+      handleNext();
+    }, FRAME_TIME);
+  } else {
+    isAuto = false;
+    document.getElementById('reset').disabled = false;
+    clearInterval(autoInterval);
+  }
+});
+
 function reset() {
   IS.randomGraph(4, 2);
 
@@ -78,6 +101,13 @@ function reset() {
   cars.forEach((car) => {
     scene.remove(car);
   });
+
+  // reset variables
+  numOfSteps = 0;
+  isReversed = false;
+  if (isAuto) {
+    autoSwitch.click();
+  }
 
   const carsConfig = getCarsConfig(IS.reset());
   cars = carsConfig.map((config) => {
@@ -88,27 +118,6 @@ function reset() {
   renderer.render(scene, camera);
 }
 reset();
-
-let autoInterval = null;
-let animationInterval = null;
-let counter = 0;
-let numOfSteps = 0;
-let isReversed = false;
-let isAuto = false;
-
-const autoSwitch = document.getElementById('auto');
-autoSwitch.addEventListener('change', function () {
-  if (this.checked) {
-    isAuto = true;
-    handleNext();
-    autoInterval = setInterval(() => {
-      handleNext();
-    }, FRAME_TIME);
-  } else {
-    isAuto = false;
-    clearInterval(autoInterval);
-  }
-});
 
 const nextButton = document.getElementById('next');
 const prevButton = document.getElementById('prev');
