@@ -13,10 +13,8 @@ import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
 } from './constants';
-import {getRotationZ} from './utils';
+import {getRotationZ, Text} from './utils';
 import {RoundedBoxGeometry} from 'three/examples/jsm/geometries/RoundedBoxGeometry';
-import {font} from './font';
-import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
 import {ModelManager} from './modelManager';
 import {randomStuff} from './randomStuff';
 
@@ -53,20 +51,20 @@ function getLine(x1, y1, x2, y2) {
   return new THREE.CatmullRomCurve3(points);
 }
 
-function getIndices() {
+function getZoneIndices() {
   // TODO: refactor
-  const text_00 = new Text('(0, 0)', 20);
+  const text_00 = new Text('(0, 0)');
   text_00.position.x = -40;
-  text_00.position.y = -gridHeight + 30;
-  const text_01 = new Text('(0, 1)', 20);
+  text_00.position.y = -gridHeight + 25;
+  const text_01 = new Text('(0, 1)');
   text_01.position.x = -40;
-  text_01.position.y = 30;
-  const text_10 = new Text('(1, 0)', 20);
+  text_01.position.y = 25;
+  const text_10 = new Text('(1, 0)');
   text_10.position.x = -40 + gridWidth;
-  text_10.position.y = -gridHeight + 30;
-  const text_11 = new Text('(1, 1)', 20);
+  text_10.position.y = -gridHeight + 25;
+  const text_11 = new Text('(1, 1)');
   text_11.position.x = -40 + gridWidth;
-  text_11.position.y = 30;
+  text_11.position.y = 25;
   return [text_00, text_01, text_10, text_11];
 }
 
@@ -95,7 +93,7 @@ function getRoad(mapWidth, mapHeight, nZones) {
   const blocks = getBlocks(2000);
   road.add(blocks);
 
-  getIndices().forEach((index) => {
+  getZoneIndices().forEach((index) => {
     road.add(index);
   });
 
@@ -366,29 +364,5 @@ const getPaths = (car, trajectory, order) => {
   });
   return rotatedPath;
 };
-
-// TODO: duplicated with car.js
-function Text(string, size = 15) {
-  // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
-  const geometry = new TextGeometry(string, {
-    font: font,
-    size: size,
-    height: 1,
-    curveSegments: 10,
-    bevelEnabled: false,
-    bevelOffset: 0,
-    bevelSegments: 1,
-    bevelSize: 0.3,
-    bevelThickness: 1,
-  }).center();
-  const materials = [
-    new THREE.MeshPhongMaterial({color: 0x000000}), // front
-    new THREE.MeshPhongMaterial({color: 0x000000}), // side
-  ];
-  const textMesh = new THREE.Mesh(geometry, materials);
-  // textMesh.castShadow = true
-
-  return textMesh;
-}
 
 export {getRoad, getPaths};

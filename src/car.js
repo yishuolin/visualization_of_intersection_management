@@ -1,8 +1,6 @@
 import {getPaths} from './road';
 import {CAR_HEIGHT, CAR_WIDTH, CAR_LENGTH} from './constants';
-import {getRotationZ, getRandomColor} from './utils';
-import {font} from './font';
-import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
+import {getRotationZ, getRandomColor, Text} from './utils';
 const showTexture = true;
 
 function Car(config) {
@@ -67,29 +65,6 @@ function getCarSideTexture() {
   context.fillRect(58, 8, 60, 24);
 
   return new THREE.CanvasTexture(canvas);
-}
-
-function Text(string, size = 15) {
-  // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
-  const geometry = new TextGeometry(string, {
-    font: font,
-    size: size,
-    height: 1,
-    curveSegments: 10,
-    bevelEnabled: false,
-    bevelOffset: 0,
-    bevelSegments: 1,
-    bevelSize: 0.3,
-    bevelThickness: 1,
-  }).center();
-  const materials = [
-    new THREE.MeshPhongMaterial({color: 0x000000}), // front
-    new THREE.MeshPhongMaterial({color: 0x000000}), // side
-  ];
-  const textMesh = new THREE.Mesh(geometry, materials);
-  // textMesh.castShadow = true
-
-  return textMesh;
 }
 
 function Wheel() {

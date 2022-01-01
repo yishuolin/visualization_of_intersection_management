@@ -1,3 +1,5 @@
+import {font} from './font';
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
 import {LANE_1, LANE_2, LANE_3, LANE_4, CAR_LENGTH, nZones} from './constants';
 
 function Stack() {
@@ -71,4 +73,32 @@ const getInitialPosition = {
   }),
 };
 
-export {Stack, getRotationZ, getRandomColor, laneAdapter, getInitialPosition};
+function Text(string, size = 15) {
+  // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
+  const geometry = new TextGeometry(string, {
+    font: font,
+    size: size,
+    height: 1,
+    curveSegments: 10,
+    bevelEnabled: false,
+    bevelOffset: 0,
+    bevelSegments: 1,
+    bevelSize: 0.3,
+    bevelThickness: 1,
+  }).center();
+  const materials = [
+    new THREE.MeshPhongMaterial({color: 0x000000}), // front
+    new THREE.MeshPhongMaterial({color: 0x000000}), // side
+  ];
+  const textMesh = new THREE.Mesh(geometry, materials);
+  return textMesh;
+}
+
+export {
+  Stack,
+  getRotationZ,
+  getRandomColor,
+  laneAdapter,
+  getInitialPosition,
+  Text,
+};
