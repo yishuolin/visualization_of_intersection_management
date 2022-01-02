@@ -9,19 +9,19 @@ export default class extends IntersectionManagement {
   }
 
   pickRandomSolution() {
-    let edges = this.timingConflictGraph.filter('edge[type = 3]');
-    let edges_sort = edges.sort((a, b) => a.data('id') - b.data('id'));
     let retryNum = 1000;
+    let edges = this.timingConflictGraph.filter('edge[type = 3]');
     do {
-      for (let index = 0; index < edges_sort.length / 2; index++) {
+      edges.forEach((edge) => {
+        let reverseEdge = this.timingConflictGraph.elements().filter(`edge[source = '${edge.data('target')}'][target = '${edge.data('source')}']`)[0];
         if (Math.random() > 0.5) {
-          edges_sort[index * 2].addClass(['cy-disabled']);
-          edges_sort[index * 2 + 1].removeClass(['cy-disabled']);
+          edge.addClass(['cy-disabled']);
+          reverseEdge.removeClass(['cy-disabled']);
         } else {
-          edges_sort[index * 2].removeClass(['cy-disabled']);
-          edges_sort[index * 2 + 1].addClass(['cy-disabled']);
+          edge.removeClass(['cy-disabled']);
+          reverseEdge.addClass(['cy-disabled']);
         }
-      }
+      });
     } while (this.isCycleExist() && retryNum-- > 0);
     if (this.isCycleExist()) {
       alert('no solution found');

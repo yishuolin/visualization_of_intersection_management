@@ -43,7 +43,7 @@ export default class {
       }
       else if (event.target.isEdge() && event.target.data('type') == 3) {
         event.target.addClass('cy-disabled');
-        let reverseEdge = this.timingConflictGraph.elements().filter(`[source = '${event.target.data('target')}'][target = '${event.target.data('source')}']`)[0];
+        let reverseEdge = this.timingConflictGraph.elements().filter(`edge[source = '${event.target.data('target')}'][target = '${event.target.data('source')}']`)[0];
         reverseEdge.removeClass('cy-disabled');
       }
     });
