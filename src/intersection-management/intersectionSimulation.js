@@ -198,4 +198,13 @@ export default class extends IntersectionManagement {
     }
     return carInfos;
   }
+  isDeadlock() {
+    let movableNodes = this._getZeroIncomerNodes();
+    let flag = true;
+    movableNodes.forEach((node) => {
+      if ((node.data('inLane') == false) || !(node.data('position')[0].includes('-')))
+        flag = false;
+    });
+    return flag;
+  }
 }

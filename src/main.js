@@ -24,6 +24,7 @@ document.getElementById('checkCycle').onclick = () =>
 document.getElementById('reset').onclick = () => reset();
 document.getElementById('showOnlyZones').onclick = () => IS.showOnlyZones();
 document.getElementById('showFull').onclick = () => IS.showFull();
+document.getElementById('isDeadlock').onclick = () => console.log(IS.isDeadlock());
 
 const totalCarsInput = document.getElementById('total-cars');
 const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');
