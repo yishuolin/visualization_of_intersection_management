@@ -34,6 +34,17 @@ export default class {
         return str;
       })
       .update();
+    this.timingConflictGraph.addListener('click',(event)=>{
+      if (event.target == this.timingConflictGraph) {
+        this.timingConflictGraph.elements().removeClass('cy-selected');
+        return;
+      }
+      else if (event.target.isEdge() && event.target.data('type') == 3) {
+        event.target.addClass('cy-disabled');
+        let reverseEdge = this.timingConflictGraph.elements().filter(`[source = '${event.target.data('target')}'][target = '${event.target.data('source')}']`)[0];
+        reverseEdge.removeClass('cy-disabled');
+      }
+    });
   }
 
   _layoutGraph() {
