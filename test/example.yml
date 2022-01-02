@@ -1,0 +1,12 @@
+1:
+  lane: lane_1
+  order: 2
+  direction: turn_left
+2:
+  lane: lane_1
+  order: 1
+  direction: turn_left
+3:
+  lane: lane_2
+  order: 1
+  direction: turn_right
