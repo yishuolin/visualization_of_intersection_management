@@ -60,7 +60,7 @@ export default class {
         collideRadius: 50,
         collideStrength: 1,
         manyBodyStrength: -300,
-        linkDistance: 100,
+        linkDistance: 150,
         infinite: true,
       })
       .run();
