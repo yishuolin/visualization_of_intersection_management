@@ -73,7 +73,7 @@ export default class {
     // TODO: different lane size
     this.laneSize = 4;
     this.carPaths = pathPicker4(nCars, maxLaneCars);
-    console.log(this.carPaths);
+    // console.log(this.carPaths);
     // TODOEND: different lane size
     this._generateGraph();
     this._layoutGraph();
@@ -84,7 +84,7 @@ export default class {
     let userData = yaml.load(yaml_string);
     for (const [car, data] of Object.entries(userData))
       data.targetLane = mapTargetLaneName4(data.lane, data.direction);
-    console.log(userData);
+    // console.log(userData);
     this.carPaths = userData;
     this._generateGraph();
     this._layoutGraph();
