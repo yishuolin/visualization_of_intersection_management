@@ -4,7 +4,14 @@ import {camera} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
-import {Stack, laneAdapter, getInitialPosition} from './utils';
+import {
+  Stack,
+  laneAdapter,
+  getInitialPosition,
+  decrement,
+  increment,
+  cycleValidationFail,
+} from './utils';
 import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
@@ -86,6 +93,11 @@ let cars = [];
 
 const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    this.checked = !this.checked;
+    return;
+  }
   if (this.checked) {
     document.getElementById('reset').disabled = true;
     handleNext();
@@ -161,6 +173,10 @@ const getStepNext = () => {
 
 const stepsStack = new Stack();
 const handleNext = () => {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    return;
+  }
   isReversed = false;
   numOfSteps++;
   stepsStack.push(getStepNext());
@@ -169,6 +185,10 @@ const handleNext = () => {
   prevButton.disabled = true;
 };
 const handlePrev = () => {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    return;
+  }
   isReversed = true;
   numOfSteps--;
   IS.stepPrev();
@@ -207,26 +227,6 @@ function animation() {
 setInterval(() => renderer.render(scene, camera), 10);
 
 // counter
-function decrement(e) {
-  const btn = e.target.parentNode.parentElement.querySelector(
-    'button[data-action="decrement"]',
-  );
-  const target = btn.nextElementSibling;
-  let value = Number(target.value);
-  value--;
-  target.value = value;
-}
-
-function increment(e) {
-  const btn = e.target.parentNode.parentElement.querySelector(
-    'button[data-action="decrement"]',
-  );
-  const target = btn.nextElementSibling;
-  let value = Number(target.value);
-  value++;
-  target.value = value;
-}
-
 const decrementButtons = document.querySelectorAll(
   `button[data-action="decrement"]`,
 );
