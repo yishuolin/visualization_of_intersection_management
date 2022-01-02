@@ -30,6 +30,7 @@ document.getElementById('file-input').onchange = (e) => {
   const reader = new FileReader();
   reader.onload = () => {
     IS.userGraph(reader.result);
+    reset();
   }
   reader.readAsText(file);
 }
