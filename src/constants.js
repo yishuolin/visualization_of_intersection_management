@@ -43,6 +43,9 @@ const MAX_PREV_STEPS = 500; // TODO: drop the contraint or add the contraint to 
 // scene
 const SCENE_WIDTH = 4000;
 const SCENE_HEIGHT = 4000;
+const NEAR_PLANE = -1200;
+const FAR_PLANE = 2000;
+
 
 export {
   nZones,
@@ -76,4 +79,6 @@ export {
   STUFF_NUM,
   SCENE_WIDTH,
   SCENE_HEIGHT,
+  NEAR_PLANE,
+  FAR_PLANE,
 };
