@@ -11,7 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@themesberg/flowbite": "^1.2.0",
     "cytoscape": "^3.20.0",
     "cytoscape-d3-force": "^1.1.4",
     "js-yaml": "^4.1.0",
