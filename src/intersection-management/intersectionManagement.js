@@ -1,8 +1,10 @@
 import cytoscape from 'cytoscape';
 import cycss from './cycss.txt';
 import d3Force from 'cytoscape-d3-force';
-import pathPicker4 from './pathPicker4.js';
+import {pathPicker4, mapTargetLaneName4} from './pathPicker4.js';
 import conflictZonePath4 from './conflictZonePath4.js';
+import yaml from 'js-yaml';
+import { CompressedPixelFormat } from 'three';
 cytoscape.use(d3Force);
 
 export default class {
@@ -71,14 +73,19 @@ export default class {
     // TODO: different lane size
     this.laneSize = 4;
     this.carPaths = pathPicker4(nCars, maxLaneCars);
+    console.log(this.carPaths);
     // TODOEND: different lane size
     this._generateGraph();
     this._layoutGraph();
   }
 
-  userGraph(yaml) {
+  userGraph(yaml_string) {
     this.timingConflictGraph.elements().remove();
-    // TODO: parse yaml to get nCars, maxLaneCars, carPaths
+    let userData = yaml.load(yaml_string);
+    for (const [car, data] of Object.entries(userData))
+      data.targetLane = mapTargetLaneName4(data.lane, data.direction);
+    console.log(userData);
+    this.carPaths = userData;
     this._generateGraph();
     this._layoutGraph();
   }
@@ -110,7 +117,7 @@ export default class {
             position: [path.lane, order],
           },
         });
-        addLaneData(path.lane, order, {car: car, lane: path.lane});
+        addLaneData(path.lane, order, {car: car, lane: path.lane, order: path.order});
       }
       for (let order = path.order; order > 1; order--) {
         this.timingConflictGraph.add({
@@ -148,6 +155,7 @@ export default class {
         addZoneData(currentZone[0], currentZone[1], {
           car: car,
           lane: path.lane,
+          order: path.order
         });
       }
       for (
@@ -184,7 +192,7 @@ export default class {
           },
         });
 
-        addLaneData(path.targetLane, order, {car: car, lane: path.lane});
+        addLaneData(path.targetLane, order, {car: car, lane: path.lane, order: path.order});
       }
 
       for (let order = 1; order <= this.maxLeaveOrder - 1; order++) {
@@ -239,7 +247,7 @@ export default class {
     // lanes
     for (const [lane, orders] of Object.entries(tempLane)) {
       for (const [order, cars] of Object.entries(orders)) {
-        let sortedcars = cars.sort((a, b) => a.car > b.car);
+        let sortedcars = cars.sort((a, b) => a.order - b.order);
 
         for (let index = 0; index < sortedcars.length; index++) {
           for (let index2 = index + 1; index2 < sortedcars.length; index2++) {
@@ -265,7 +273,7 @@ export default class {
     // conflict zones
     for (const [zoneX, zoneYs] of Object.entries(tempZone)) {
       for (const [zoneY, cars] of Object.entries(zoneYs)) {
-        let sortedcars = cars.sort((a, b) => a.car > b.car);
+        let sortedcars = cars.sort((a, b) => a.order - b.order);
         for (let index = 0; index < sortedcars.length; index++) {
           for (let index2 = index + 1; index2 < sortedcars.length; index2++) {
             const car = sortedcars[index];
