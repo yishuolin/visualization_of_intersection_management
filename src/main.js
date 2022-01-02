@@ -4,7 +4,14 @@ import {camera} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
-import {Stack, laneAdapter, getInitialPosition} from './utils';
+import {
+  Stack,
+  laneAdapter,
+  getInitialPosition,
+  decrement,
+  increment,
+  cycleValidationFail,
+} from './utils';
 import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
@@ -14,7 +21,6 @@ let animationInterval = null;
 let counter = 0;
 let numOfSteps = 0;
 let isReversed = false;
-let isAuto = false;
 
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
 document.getElementById('randCars').onclick = () => generateRandomCars();
@@ -22,18 +28,17 @@ document.getElementById('randSol').onclick = () => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = () =>
   console.log(IS.isCycleExist(true));
 document.getElementById('reset').onclick = () => reset();
-document.getElementById('showOnlyZones').onclick = () => IS.showOnlyZones();
-document.getElementById('showFull').onclick = () => IS.showFull();
-document.getElementById('isDeadlock').onclick = () => console.log(IS.isDeadlock());
+document.getElementById('isDeadlock').onclick = () =>
+  console.log(IS.isDeadlock());
 document.getElementById('file-input').onchange = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
     IS.userGraph(reader.result);
     reset();
-  }
+  };
   reader.readAsText(file);
-}
+};
 
 const totalCarsInput = document.getElementById('total-cars');
 const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');
@@ -86,18 +91,25 @@ let cars = [];
 
 const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    this.checked = !this.checked;
+    return;
+  }
   if (this.checked) {
-    isAuto = true;
     document.getElementById('reset').disabled = true;
     handleNext();
     autoInterval = setInterval(() => {
       handleNext();
     }, FRAME_TIME);
   } else {
-    isAuto = false;
     document.getElementById('reset').disabled = false;
     clearInterval(autoInterval);
   }
+});
+const showFullGraphSwitch = document.getElementById('show-full-graph');
+showFullGraphSwitch.addEventListener('change', function () {
+  this.checked ? IS.showFull() : IS.showOnlyZones();
 });
 
 const start = () => {
@@ -108,6 +120,10 @@ const start = () => {
 function generateRandomCars() {
   if (!totalCarsInput.value || !maxCarsPerLaneInput.value) {
     alert('Please enter the number of cars and max cars per lane');
+    return;
+  }
+  if (totalCarsInput.value <= 0 || maxCarsPerLaneInput.value <= 0) {
+    alert('Please enter a number greater than 0');
     return;
   }
   start();
@@ -123,8 +139,11 @@ function reset() {
   numOfSteps = 0;
   document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
   isReversed = false;
-  if (isAuto) {
+  if (autoSwitch.checked) {
     autoSwitch.click();
+  }
+  if (!showFullGraphSwitch.checked) {
+    IS.showOnlyZones();
   }
 
   const carsConfig = getCarsConfig(IS.reset());
@@ -152,6 +171,10 @@ const getStepNext = () => {
 
 const stepsStack = new Stack();
 const handleNext = () => {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    return;
+  }
   isReversed = false;
   numOfSteps++;
   stepsStack.push(getStepNext());
@@ -160,6 +183,10 @@ const handleNext = () => {
   prevButton.disabled = true;
 };
 const handlePrev = () => {
+  if (IS.isCycleExist()) {
+    cycleValidationFail();
+    return;
+  }
   isReversed = true;
   numOfSteps--;
   IS.stepPrev();
@@ -176,7 +203,7 @@ function animation() {
   if (counter > FRAME_TIME) {
     counter = 0;
     clearInterval(animationInterval);
-    if (!isAuto) {
+    if (!autoSwitch.checked) {
       nextButton.disabled = false;
       prevButton.disabled = numOfSteps === 0;
     }
@@ -196,5 +223,20 @@ function animation() {
   }
 }
 setInterval(() => renderer.render(scene, camera), 10);
-// https://stackoverflow.com/questions/35495812/move-an-object-along-a-path-or-spline-in-threejs
-// https://juejin.cn/post/6976897135794978853
+
+// counter
+const decrementButtons = document.querySelectorAll(
+  `button[data-action="decrement"]`,
+);
+
+const incrementButtons = document.querySelectorAll(
+  `button[data-action="increment"]`,
+);
+
+decrementButtons.forEach((btn) => {
+  btn.addEventListener('click', decrement);
+});
+
+incrementButtons.forEach((btn) => {
+  btn.addEventListener('click', increment);
+});

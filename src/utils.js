@@ -96,6 +96,29 @@ function Text(string, size = 15) {
   return textMesh;
 }
 
+function decrement(e) {
+  const btn = e.target.parentNode.parentElement.querySelector(
+    'button[data-action="decrement"]',
+  );
+  const target = btn.nextElementSibling;
+  let value = Number(target.value);
+  value--;
+  target.value = value;
+}
+
+function increment(e) {
+  const btn = e.target.parentNode.parentElement.querySelector(
+    'button[data-action="decrement"]',
+  );
+  const target = btn.nextElementSibling;
+  let value = Number(target.value);
+  value++;
+  target.value = value;
+}
+
+const cycleValidationFail = () => {
+  alert('Please remove type-3 edges first.');
+};
 export {
   Stack,
   getRotationZ,
@@ -103,4 +126,7 @@ export {
   laneAdapter,
   getInitialPosition,
   Text,
+  decrement,
+  increment,
+  cycleValidationFail,
 };

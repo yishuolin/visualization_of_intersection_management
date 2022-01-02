@@ -5,7 +5,8 @@
   <meta charset="utf-8" />
   <title>Final Project</title>
   <style></style>
-  <link rel="stylesheet" href="index.css" />
+  <link href="index.css" rel="stylesheet"/>
+  <link href="tailwind/output.css" rel="stylesheet">
 </head>
 
 <body>
@@ -13,45 +14,76 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
   </script>
   <div id="top-buttons">
-    <span>Auto</span>
+    <button id="prev" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mx-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Prev
+    </button>
+    <button id="next" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mx-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      Next
+    </button>
     <label class="switch">
       <input id="auto" type="checkbox">
       <span class="slider round"></span>
     </label>
-    <button id="prev">Prev</button>
-    <button id="next">Next</button>
-    <span id="step">Step: 0</span>
+    <span class="text-white font-medium">Auto</span>
+    <div id="step" class="text-white font-medium">Step: 0</div>
   </div>
-  <div class="container">
+  <div id="top-right">
+    <label class="switch">
+      <input id="show-full-graph" type="checkbox" checked>
+      <span class="slider round"></span>
+    </label>
+    <span>Show Full Graph</span>
+  </div>
+  <div id="container">
     <div id="intersection"></div>
     <div id="graph">
       <div id="cy"></div>
-      <!-- <div id="resource-conflict-graph"></div> -->
-    </div>
-  </div>
-  <div id="bottom-buttons">
-    <div>
-      <div>
-        <label>
-          Total Cars:
-          <input id="total-cars" type="number" value="4">
-        </label>
+      <div class="">
+        <div class="flex w-full counters-container">
+          <div class="custom-number-input w-32">
+            <label for="custom-input-number" class="w-full text-sm font-semibold">Total cars
+            </label>
+            <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
+              <button data-action="decrement" class=" bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer outline-none">
+                <span class="m-auto text-2xl font-thin">−</span>
+              </button>
+              <input id="total-cars" type="number" class="outline-none focus:outline-none text-center w-full bg-gray-300 font-semibold text-md hover:text-black focus:text-black  md:text-basecursor-default flex items-center text-gray-700  outline-none" name="custom-input-number" value="4"></input>
+              <button data-action="increment" class="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-r cursor-pointer">
+              <span class="m-auto text-2xl font-thin">+</span>
+              </button>
+            </div>
+          </div>
+          <div class="custom-number-input w-32">
+            <label for="custom-input-number" class="w-full text-sm font-semibold">Cars per lane
+            </label>
+            <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
+              <button data-action="decrement" class=" bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer outline-none">
+                <span class="m-auto text-2xl font-thin">−</span>
+              </button>
+              <input id="max-cars-per-lane" type="number" class="outline-none focus:outline-none text-center w-full bg-gray-300 font-semibold text-md hover:text-black focus:text-black  md:text-basecursor-default flex items-center text-gray-700  outline-none" name="custom-input-number" value="2"></input>
+              <button data-action="increment" class="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-r cursor-pointer">
+                <span class="m-auto text-2xl font-thin">+</span>
+              </button>
+            </div>
+          </div>
+          <div style="margin-top: 30px;">
+            <button id="randCars" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded-lg">
+              Generate
+            </button>
+          </div>
+        </div>
+        <div id="bottom-buttons">
+          <button id="randSol" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Random Solution</button>
+          <button id="checkCycle" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Cycle</button>
+          <button id="reset" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Reset</button>
+          <button id="isDeadlock" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Deadlock</button>
+          <!-- <input id="file-input" type="file" accept=".yaml,.yml" /> -->
+          <label for="file-input" class="form-label inline-block mb-2 text-gray-700"></label>
+          <input class="form-control block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0
+          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" type="file" id="file-input" accept=".yaml,.yml">
+        </div>
       </div>
-      <div>
-        <label>
-          Maximum Cars Per Lane:
-          <input id="max-cars-per-lane" type="number" value="2">
-        </label>
-      </div>
     </div>
-    <button id="randCars">Generate Random Cars</button>
-    <button id="randSol">Pick Random Solution</button>
-    <button id="checkCycle">Check Cycle</button>
-    <button id="reset">Reset</button>
-    <button id="showOnlyZones">Show Only Zones</button>
-    <button id="showFull">Show Full Graph</button>
-    <button id="isDeadlock">Check Deadlock</button>
-    <input id="file-input" type="file" accept=".yaml,.yml" />
   </div>
 </body>
 
