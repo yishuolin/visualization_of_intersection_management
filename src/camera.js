@@ -1,3 +1,4 @@
+import {NEAR_PLANE, FAR_PLANE} from './constants'
 const aspectRatio =
   document.getElementById('intersection').offsetWidth /
   document.getElementById('intersection').offsetHeight;
@@ -9,8 +10,8 @@ const camera = new THREE.OrthographicCamera(
   cameraWidth / 2, // right
   cameraHeight / 2, // top
   cameraHeight / -2, // bottom
-  -2000, // near plane
-  2000, // far plane
+  NEAR_PLANE, // near plane
+  FAR_PLANE, // far plane
 );
 
 camera.position.set(0, -150, 300);
