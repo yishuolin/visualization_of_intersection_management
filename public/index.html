@@ -27,6 +27,13 @@
     <span class="text-white font-medium">Auto</span>
     <div id="step" class="text-white font-medium">Step: 0</div>
   </div>
+  <div id="top-right">
+    <label class="switch">
+      <input id="show-full-graph" type="checkbox" checked>
+      <span class="slider round"></span>
+    </label>
+    <span>Show Full Graph</span>
+  </div>
   <div id="container">
     <div id="intersection"></div>
     <div id="graph">
@@ -69,11 +76,11 @@
           <button id="randSol" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Random Solution</button>
           <button id="checkCycle" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Cycle</button>
           <button id="reset" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Reset</button>
-          <label class="switch">
-            <input id="show-full-graph" type="checkbox" checked>
-            <span class="slider round"></span>
-          </label>
-          <span>Show Full Graph</span>
+          <button id="isDeadlock" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Deadlock</button>
+          <!-- <input id="file-input" type="file" accept=".yaml,.yml" /> -->
+          <label for="file-input" class="form-label inline-block mb-2 text-gray-700"></label>
+          <input class="form-control block px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0
+          focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" type="file" id="file-input" accept=".yaml,.yml">
         </div>
       </div>
     </div>

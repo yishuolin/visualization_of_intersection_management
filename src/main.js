@@ -28,8 +28,6 @@ document.getElementById('randSol').onclick = () => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = () =>
   console.log(IS.isCycleExist(true));
 document.getElementById('reset').onclick = () => reset();
-document.getElementById('showOnlyZones').onclick = () => IS.showOnlyZones();
-document.getElementById('showFull').onclick = () => IS.showFull();
 document.getElementById('isDeadlock').onclick = () =>
   console.log(IS.isDeadlock());
 document.getElementById('file-input').onchange = (e) => {
