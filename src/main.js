@@ -25,6 +25,14 @@ document.getElementById('reset').onclick = () => reset();
 document.getElementById('showOnlyZones').onclick = () => IS.showOnlyZones();
 document.getElementById('showFull').onclick = () => IS.showFull();
 document.getElementById('isDeadlock').onclick = () => console.log(IS.isDeadlock());
+document.getElementById('file-input').onchange = (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    IS.userGraph(reader.result);
+  }
+  reader.readAsText(file);
+}
 
 const totalCarsInput = document.getElementById('total-cars');
 const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');

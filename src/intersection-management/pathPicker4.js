@@ -1,4 +1,48 @@
-export default function (nCars, maxLaneCars) {
+const mapTargetLaneName4 = (sourceLaneName, directionName) => {
+  switch (sourceLaneName) {
+    case 'lane_1':
+      switch (directionName) {
+        case 'turn_left':
+          return 'lane_-3';
+        case 'turn_right':
+          return 'lane_-4';
+        case 'go_straight':
+          return 'lane_-2';
+      }
+    case 'lane_2':
+      switch (directionName) {
+        case 'turn_left':
+          return 'lane_-4';
+        case 'turn_right':
+          return 'lane_-3';
+        case 'go_straight':
+          return 'lane_-1';
+      }
+    case 'lane_3':
+      switch (directionName) {
+        case 'turn_left':
+          return 'lane_-2';
+        case 'turn_right':
+          return 'lane_-1';
+        case 'go_straight':
+          return 'lane_-4';
+      }
+    case 'lane_4':
+      switch (directionName) {
+        case 'turn_left':
+          return 'lane_-1';
+        case 'turn_right':
+          return 'lane_-2';
+        case 'go_straight':
+          return 'lane_-3';
+      }
+    default:
+      throw new Error(`sourceLaneName not found: ${sourceLaneName}`);
+  }
+};
+
+
+function pathPicker4(nCars, maxLaneCars) {
   const laneSize = 4;
   if (maxLaneCars * laneSize < nCars)
     throw new Error('maxLaneCars * laneSize > nCars');
@@ -9,48 +53,7 @@ export default function (nCars, maxLaneCars) {
       : directionId == 1
       ? 'turn_right'
       : 'go_straight';
-  const mapTargetLaneName = (sourceLaneName, directionName) => {
-    switch (sourceLaneName) {
-      case 'lane_1':
-        switch (directionName) {
-          case 'turn_left':
-            return 'lane_-3';
-          case 'turn_right':
-            return 'lane_-4';
-          case 'go_straight':
-            return 'lane_-2';
-        }
-      case 'lane_2':
-        switch (directionName) {
-          case 'turn_left':
-            return 'lane_-4';
-          case 'turn_right':
-            return 'lane_-3';
-          case 'go_straight':
-            return 'lane_-1';
-        }
-      case 'lane_3':
-        switch (directionName) {
-          case 'turn_left':
-            return 'lane_-2';
-          case 'turn_right':
-            return 'lane_-1';
-          case 'go_straight':
-            return 'lane_-4';
-        }
-      case 'lane_4':
-        switch (directionName) {
-          case 'turn_left':
-            return 'lane_-1';
-          case 'turn_right':
-            return 'lane_-2';
-          case 'go_straight':
-            return 'lane_-3';
-        }
-      default:
-        throw new Error('sourceLaneId not found');
-    }
-  };
+  
   let path = {};
   let laneCars = {};
   for (let index = 0; index < laneSize; index++) laneCars[index] = 0;
@@ -64,7 +67,7 @@ export default function (nCars, maxLaneCars) {
       lane: mapLaneName(lane),
       order: order,
       direction: mapDirectionName(direction),
-      targetLane: mapTargetLaneName(
+      targetLane: mapTargetLaneName4(
         mapLaneName(lane),
         mapDirectionName(direction),
       ),
@@ -73,3 +76,5 @@ export default function (nCars, maxLaneCars) {
 
   return path;
 }
+
+export {pathPicker4, mapTargetLaneName4};
