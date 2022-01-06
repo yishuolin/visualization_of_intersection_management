@@ -171,6 +171,7 @@ function getLineMarkings(mapWidth, mapHeight, intersectionAreaSize, nZones) {
     context.lineTo(intersectionAreaEnd.x, intersectionAreaStart.y + offsetY);
     context.stroke();
   }
+
   return new THREE.CanvasTexture(canvas);
 }
 

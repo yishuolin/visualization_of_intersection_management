@@ -20,7 +20,7 @@ body {
   overflow-y: hidden;
 }
 #cy {
-  height: 77vh;
+  height: 75vh;
   overflow-x: hidden;
   border-bottom: 2px solid black;
 }
@@ -117,5 +117,11 @@ input[type='number']::-webkit-inner-spin-button {
   margin-left: 10px;
 }
 #bottom-buttons {
+  margin: 10px 0px 0px 9px;
+}
+.file {
   margin-left: 9px;
+}
+#file-input {
+  margin-right: 15px;
 }

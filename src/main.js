@@ -26,10 +26,11 @@ const IS = new IntersectionSimulation(MAX_PREV_STEPS);
 document.getElementById('randCars').onclick = () => generateRandomCars();
 document.getElementById('randSol').onclick = () => IS.pickRandomSolution();
 document.getElementById('checkCycle').onclick = () =>
-  console.log(IS.isCycleExist(true));
+  // console.log(IS.isCycleExist(true));
+  document.getElementById('cy').childNodes[0].childNodes[2].click();
 document.getElementById('reset').onclick = () => reset();
-document.getElementById('isDeadlock').onclick = () =>
-  console.log(IS.isDeadlock());
+// document.getElementById('isDeadlock').onclick = () =>
+//   console.log(IS.isDeadlock());
 document.getElementById('file-input').onchange = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -91,7 +92,7 @@ let cars = [];
 
 const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
-  if (IS.isCycleExist()) {
+  if (IS.isCycleExist(true)) {
     cycleValidationFail();
     this.checked = !this.checked;
     return;
@@ -171,8 +172,12 @@ const getStepNext = () => {
 
 const stepsStack = new Stack();
 const handleNext = () => {
-  if (IS.isCycleExist()) {
+  if (IS.isCycleExist(true)) {
     cycleValidationFail();
+    return;
+  }
+  if (IS.isDeadlock()) {
+    alert('Deadlock detected.');
     return;
   }
   isReversed = false;
@@ -183,7 +188,7 @@ const handleNext = () => {
   prevButton.disabled = true;
 };
 const handlePrev = () => {
-  if (IS.isCycleExist()) {
+  if (IS.isCycleExist(true)) {
     cycleValidationFail();
     return;
   }

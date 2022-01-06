@@ -117,7 +117,7 @@ function increment(e) {
 }
 
 const cycleValidationFail = () => {
-  alert('Please remove type-3 edges first.');
+  alert('Please remove cycle(s) first.');
 };
 export {
   Stack,
