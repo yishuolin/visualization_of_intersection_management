@@ -6,6 +6,8 @@ export default class extends IntersectionManagement {
     this.carPositions = {};
     this.nPrev = nPrev;
     this.prevNodes = [];
+    this.showCycleFlag = false;
+    this.handler = () => {this.showCycle(this.showCycleFlag);}
   }
 
   pickRandomSolution() {
@@ -52,6 +54,7 @@ export default class extends IntersectionManagement {
     return scc.components.some((scc) => scc.length > 1);
   }
   showCycle(enable=true) {
+    this.showCycleFlag = enable;
     this.timingConflictGraph.elements().removeClass(['cy-selected']);
     if (!enable)
       return;
