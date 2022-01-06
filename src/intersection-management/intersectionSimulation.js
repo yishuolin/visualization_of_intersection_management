@@ -6,6 +6,8 @@ export default class extends IntersectionManagement {
     this.carPositions = {};
     this.nPrev = nPrev;
     this.prevNodes = [];
+    this.showCycleFlag = false;
+    this.handler = () => {this.showCycle(this.showCycleFlag);}
   }
 
   pickRandomSolution() {
@@ -45,22 +47,26 @@ export default class extends IntersectionManagement {
   _getFullGraph() {
     return this.timingConflictGraph.elements().not('.cy-disabled');
   }
-  isCycleExist(select = false) {
+  isCycleExist() {
     let scc = this._getFullGraph()
       .filter('[!inLane]')
       .tarjanStronglyConnectedComponents();
-    if (select) {
-      this.timingConflictGraph.elements().removeClass(['cy-selected']);
-      for (let index = 0; index < scc.components.length; index++)
-        if (scc.components[index].length > 1) {
-          // only select the first one
-          scc.components[index].addClass(['cy-selected']);
-          break;
-        }
-    }
     return scc.components.some((scc) => scc.length > 1);
   }
-
+  showCycle(enable=true) {
+    this.showCycleFlag = enable;
+    this.timingConflictGraph.elements().removeClass(['cy-selected']);
+    if (!enable)
+      return;
+    let scc = this._getFullGraph()
+      .filter('[!inLane]')
+      .tarjanStronglyConnectedComponents();
+    for (let index = 0; index < scc.components.length; index++) {
+      if (scc.components[index].length > 1) {
+        scc.components[index].addClass(['cy-selected']);
+      }
+    }
+  }
   reset() {
     this.carPositions = {};
     let fullGraph = this._getFullGraph();

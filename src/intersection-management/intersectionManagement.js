@@ -14,6 +14,7 @@ export default class {
     this.maxLaneCars = undefined;
     this.carPaths = undefined;
     this.laneSize = undefined;
+    this.handler = ()=>{};
     this.timingConflictGraph = cytoscape({
       container: document.getElementById('cy'),
       wheelSensitivity: 0.1,
@@ -38,13 +39,14 @@ export default class {
       .update();
     this.timingConflictGraph.addListener('click',(event)=>{
       if (event.target == this.timingConflictGraph) {
-        this.timingConflictGraph.elements().removeClass('cy-selected');
+        // this.timingConflictGraph.elements().removeClass('cy-selected');
         return;
       }
       else if (event.target.isEdge() && event.target.data('type') == 3) {
         event.target.addClass('cy-disabled');
         let reverseEdge = this.timingConflictGraph.elements().filter(`edge[source = '${event.target.data('target')}'][target = '${event.target.data('source')}']`)[0];
         reverseEdge.removeClass('cy-disabled');
+        this.handler();
       }
     });
   }
