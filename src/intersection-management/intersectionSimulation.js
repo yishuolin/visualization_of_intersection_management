@@ -199,12 +199,23 @@ export default class extends IntersectionManagement {
     return carInfos;
   }
   isDeadlock() {
-    let movableNodes = this._getZeroIncomerNodes();
+    // if the movable nodes contain not target lane nodes, return false
     let flag = true;
+    let movableNodes = this._getZeroIncomerNodes();
     movableNodes.forEach((node) => {
       if ((node.data('inLane') == false) || !(node.data('position')[0].includes('-')))
         flag = false;
     });
-    return flag;
+    if (!flag) return false;
+    // if above not work, check if there is a node that still in the source lane or the conflict zones, return true
+    flag = false;
+    let currentNodes = this.timingConflictGraph.elements('.cy-node-current');
+    currentNodes.forEach((node) => {
+      if ((node.data('inLane') == false) || !(node.data('position')[0].includes('-')))
+        flag = true;
+    })
+    if (flag) return true;
+    // if above not work, then every node is in the target lane, return false
+    return false;
   }
 }
