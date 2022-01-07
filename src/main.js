@@ -24,13 +24,11 @@ let isReversed = false;
 
 const IS = new IntersectionSimulation(MAX_PREV_STEPS);
 document.getElementById('randCars').onclick = () => generateRandomCars();
-document.getElementById('randSol').onclick = () => IS.pickRandomSolution();
-document.getElementById('checkCycle').onclick = () =>
-  // console.log(IS.isCycleExist(true));
-  document.getElementById('cy').childNodes[0].childNodes[2].click();
+document.getElementById('randSol').onclick = () => {
+  if (showCycleSwitch.checked) showCycleSwitch.click();
+  IS.pickRandomSolution();
+};
 document.getElementById('reset').onclick = () => reset();
-// document.getElementById('isDeadlock').onclick = () =>
-//   console.log(IS.isDeadlock());
 document.getElementById('file-input').onchange = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -109,8 +107,12 @@ autoSwitch.addEventListener('change', function () {
   }
 });
 const showFullGraphSwitch = document.getElementById('show-full-graph');
+const showCycleSwitch = document.getElementById('show-cycle');
 showFullGraphSwitch.addEventListener('change', function () {
   this.checked ? IS.showFull() : IS.showOnlyZones();
+});
+showCycleSwitch.addEventListener('change', function () {
+  this.checked ? IS.showCycle(true) : IS.showCycle(false);
 });
 
 const start = () => {

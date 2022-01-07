@@ -30,20 +30,32 @@
     <span class="text-white font-medium">Auto</span>
     <div id="step" class="text-white font-medium">Step: 0</div>
   </div>
+  <div id="top-center">
+    <button id="randSol" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mx-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Random Solution</button>
+  </div>
   <div id="top-right">
-    <label class="switch">
-      <input id="show-full-graph" type="checkbox" checked>
-      <span class="slider round"></span>
-    </label>
-    <span>Show Full Graph</span>
+    <div>
+      <label class="switch">
+        <input id="show-full-graph" type="checkbox" checked>
+        <span class="slider round"></span>
+      </label>
+      <span>Show Full Graph</span>
+    </div>
+    <div>
+      <label class="switch">
+        <input id="show-cycle" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+      <span>Show Cycle</span>
+    </div>
   </div>
   <div id="container">
     <div id="intersection"></div>
     <div id="graph">
       <div id="cy"></div>
-      <div class="">
-        <div class="flex w-full counters-container">
-          <div class="custom-number-input w-32">
+      <div>
+        <div class="flex w-full bottom-buttons-row">
+          <div style="width: 151px;">
             <label for="custom-input-number" class="w-full text-sm font-semibold">Total cars
             </label>
             <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
@@ -56,7 +68,7 @@
               </button>
             </div>
           </div>
-          <div class="custom-number-input w-32">
+          <div style="width: 151px;">
             <label for="custom-input-number" class="w-full text-sm font-semibold">Cars per lane
             </label>
             <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
@@ -75,23 +87,20 @@
             </button>
           </div>
         </div>
-        <div class="flex file">
-          <div>
-            <input class="form-control block px-3 py-1 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0
-            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" type="file" id="file-input" accept=".yaml,.yml">
+        <div class="flex w-full bottom-buttons-row">
+          <div style="width: 151px;" class="bg-gray-300 rounded hover:bg-gray-400">
+            <label class="cursor-pointer text-gray-800 font-semibold py-2 px-4 inline-flex items-center" href="test/example.yml" target=”_blank”>
+              <svg class="fill-current w-4 h-4 mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" /></svg>
+              <span>Select a File</span>
+              <input id="file-input" type='file' accept=".yaml,.yml" class="hidden" />
+            </label>
           </div>
-          <div class="mx-1">
-            <a class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center" href="test/example.yml" target=”_blank”>
+          <div style="width: 151px;">
+            <a class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded inline-flex items-center" href="test/example.yml" target=”_blank”>
               <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
               <span>Example File</span>
             </a>
           </div>
-        </div>
-        <div id="bottom-buttons">
-          <button id="randSol" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Random Solution</button>
-          <button id="checkCycle" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Cycle</button>
-          <!-- <button id="reset" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Reset</button> -->
-          <!-- <button id="isDeadlock" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-1 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Check Deadlock</button> -->
         </div>
       </div>
     </div>
