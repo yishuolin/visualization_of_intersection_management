@@ -90,7 +90,7 @@ let cars = [];
 
 const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
-  if (IS.isCycleExist(true)) {
+  if (IS.isCycleExist()) {
     cycleValidationFail();
     this.checked = !this.checked;
     return;
@@ -174,7 +174,7 @@ const getStepNext = () => {
 
 const stepsStack = new Stack();
 const handleNext = () => {
-  if (IS.isCycleExist(true)) {
+  if (IS.isCycleExist()) {
     cycleValidationFail();
     return;
   }
@@ -190,7 +190,7 @@ const handleNext = () => {
   prevButton.disabled = true;
 };
 const handlePrev = () => {
-  if (IS.isCycleExist(true)) {
+  if (IS.isCycleExist()) {
     cycleValidationFail();
     return;
   }

@@ -117,7 +117,7 @@ function increment(e) {
 }
 
 const cycleValidationFail = () => {
-  alert('Please remove cycle(s) first.');
+  alert('Please remove the cycle(s) first.');
 };
 export {
   Stack,
