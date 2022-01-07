@@ -99,6 +99,14 @@ autoSwitch.addEventListener('change', function () {
     document.getElementById('reset').disabled = true;
     handleNext();
     autoInterval = setInterval(() => {
+      if (IS.isDeadlock()) {
+        alert('Deadlock detected.');
+        clearInterval(autoInterval);
+        autoSwitch.click();
+        nextButton.disabled = false;
+        prevButton.disabled = numOfSteps === 0;
+        return;
+      }
       handleNext();
     }, FRAME_TIME);
   } else {
