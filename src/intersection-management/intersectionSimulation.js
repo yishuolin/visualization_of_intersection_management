@@ -7,7 +7,8 @@ export default class extends IntersectionManagement {
     this.nPrev = nPrev;
     this.prevNodes = [];
     this.showCycleFlag = false;
-    this.handler = () => {this.showCycle(this.showCycleFlag);}
+    this.handler = () => {this.showCycle(this.showCycleFlag);
+    this.deadlock = undefined;}
   }
 
   pickRandomSolution() {
@@ -68,6 +69,7 @@ export default class extends IntersectionManagement {
     }
   }
   reset() {
+    this.deadlock = undefined;
     this.carPositions = {};
     let fullGraph = this._getFullGraph();
     fullGraph.removeClass(['cy-transparent']);
@@ -93,6 +95,7 @@ export default class extends IntersectionManagement {
       this.prevNodes.push(
         this.timingConflictGraph.elements('.cy-node-current'),
       );
+    this.deadlock = this._checkDeadlock();
     let movableNodes = this._getZeroIncomerNodes();
     movableNodes.forEach((node) => {
       // TODO: check if the node meet the end condition
@@ -120,6 +123,8 @@ export default class extends IntersectionManagement {
       let flag = false;
       do {
         flag = false;
+        if (this.deadlock)
+          this.deadlock = this._checkDeadlock();
         let movableNodes = this._getZeroIncomerNodes();
         movableNodes.forEach((node) => {
           // TODO: check if the node meet the end condition
@@ -168,6 +173,7 @@ export default class extends IntersectionManagement {
         position: node.data('position'),
       };
     });
+    this.deadlock = undefined;
   }
   getCarInfos() {
     let carInfos = {};
@@ -204,7 +210,7 @@ export default class extends IntersectionManagement {
     }
     return carInfos;
   }
-  isDeadlock() {
+  _checkDeadlock() {
     // if the movable nodes contain not target lane nodes, return false
     let flag = true;
     let movableNodes = this._getZeroIncomerNodes();
@@ -223,5 +229,8 @@ export default class extends IntersectionManagement {
     if (flag) return true;
     // if above not work, then every node is in the target lane, return false
     return false;
+  }
+  isDeadlock() {
+    return this.deadlock;
   }
 }
