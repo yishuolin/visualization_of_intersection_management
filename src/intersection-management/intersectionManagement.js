@@ -194,7 +194,7 @@ export default class {
           },
         });
 
-        addLaneData(path.targetLane, order, {car: car, lane: path.lane, order: path.order});
+        // addLaneData(path.targetLane, order, {car: car, lane: path.lane, order: path.order});
       }
 
       for (let order = 1; order <= this.maxLeaveOrder - 1; order++) {
