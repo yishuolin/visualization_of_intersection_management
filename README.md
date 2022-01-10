@@ -1,4 +1,4 @@
-# Visualization of Intersection Management
+# Visualization of Graph-Based Intersection Management
 Final project for <i>Introduction to Intelligent Vehicles</i> @NTU.
 
 ## Get Started
