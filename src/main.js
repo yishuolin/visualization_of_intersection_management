@@ -1,13 +1,12 @@
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {ambientLight, dirLight} from './light';
 import {camera} from './camera';
 import {getRoad} from './road';
 import {Car} from './car';
 import {move} from './controller';
+import {setupOrbitControls} from './orbitControls';
 import {
   Stack,
-  laneAdapter,
-  getInitialPosition,
+  getCarsConfig,
   decrement,
   increment,
   cycleValidationFail,
@@ -16,6 +15,8 @@ import {nZones, FRAME_TIME, TIME_DELTA, MAX_PREV_STEPS} from './constants';
 import IntersectionSimulation from './intersection-management/intersectionSimulation';
 
 const showShadows = true;
+const steps = new Stack();
+let cars = [];
 let autoInterval = null;
 let animationInterval = null;
 let counter = 0;
@@ -39,10 +40,15 @@ document.getElementById('file-input').onchange = (e) => {
   reader.readAsText(file);
 };
 
+// get DOM elements
+const Intersection = document.getElementById('intersection');
 const totalCarsInput = document.getElementById('total-cars');
 const maxCarsPerLaneInput = document.getElementById('max-cars-per-lane');
-
-const Intersection = document.getElementById('intersection');
+const autoSwitch = document.getElementById('auto');
+const showFullGraphSwitch = document.getElementById('show-full-graph');
+const nextButton = document.getElementById('next');
+const prevButton = document.getElementById('prev');
+const showCycleSwitch = document.getElementById('show-cycle');
 
 const scene = new THREE.Scene();
 
@@ -57,7 +63,6 @@ scene.add(
 scene.add(ambientLight);
 scene.add(dirLight);
 
-// Set up renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: 'high-performance',
@@ -66,29 +71,8 @@ renderer.setSize(Intersection.offsetWidth, Intersection.offsetHeight);
 if (showShadows) renderer.shadowMap.enabled = true;
 Intersection.appendChild(renderer.domElement);
 
-const getCarsConfig = (cars) =>
-  Object.keys(cars).map((key) => {
-    const car = cars[key];
-    return {
-      carId: parseInt(key),
-      trajectory: car.direction,
-      onLane: car.lane,
-      stage: 0,
-      position: getInitialPosition[car.lane](car),
-      targetLane: laneAdapter[car.targetLane],
-      order: car.order,
-    };
-  });
+setupOrbitControls(camera, renderer);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.maxPolarAngle = Math.PI / 3;
-controls.minPolarAngle = 0;
-controls.maxZoom = 3;
-controls.minZoom = 0.6;
-
-let cars = [];
-
-const autoSwitch = document.getElementById('auto');
 autoSwitch.addEventListener('change', function () {
   if (IS.isCycleExist()) {
     cycleValidationFail();
@@ -114,8 +98,8 @@ autoSwitch.addEventListener('change', function () {
     clearInterval(autoInterval);
   }
 });
-const showFullGraphSwitch = document.getElementById('show-full-graph');
-const showCycleSwitch = document.getElementById('show-cycle');
+
+// handle toggle switches
 showFullGraphSwitch.addEventListener('change', function () {
   this.checked ? IS.showFull() : IS.showOnlyZones();
 });
@@ -130,18 +114,21 @@ const start = () => {
 
 function generateRandomCars() {
   if (!totalCarsInput.value || !maxCarsPerLaneInput.value) {
-    alert('Please enter the number of cars and max cars per lane');
+    alert('Please enter the number of cars and max cars per lane.');
     return;
   }
   if (totalCarsInput.value <= 0 || maxCarsPerLaneInput.value <= 0) {
-    alert('Please enter a number greater than 0');
+    alert('Please enter a number greater than 0.');
     return;
   }
+  reset();
   start();
 }
 
 function reset() {
-  // remove cars from scene
+  animationInterval && clearInterval(animationInterval);
+  autoInterval && clearInterval(autoInterval);
+
   cars.forEach((car) => {
     scene.remove(car);
   });
@@ -153,24 +140,16 @@ function reset() {
   if (autoSwitch.checked) {
     autoSwitch.click();
   }
-  if (!showFullGraphSwitch.checked) {
-    IS.showOnlyZones();
-  }
+  showFullGraphSwitch.checked || IS.showOnlyZones();
 
-  const carsConfig = getCarsConfig(IS.reset());
-  cars = carsConfig.map((config) => {
-    const car = Car(config);
-    scene.add(car);
-    return car;
-  });
+  cars = getCarsConfig(IS.reset()).map((config) => new Car(config));
+  cars.forEach((car) => scene.add(car));
 
   renderer.render(scene, camera);
 }
 
 start();
 
-const nextButton = document.getElementById('next');
-const prevButton = document.getElementById('prev');
 prevButton.disabled = true;
 // TODO: handle click autoSwitch when next/prev is clicked
 
@@ -180,7 +159,6 @@ const getStepNext = () => {
   return next.map((x) => parseInt(x));
 };
 
-const stepsStack = new Stack();
 const handleNext = () => {
   if (IS.isCycleExist()) {
     cycleValidationFail();
@@ -192,7 +170,7 @@ const handleNext = () => {
   }
   isReversed = false;
   numOfSteps++;
-  stepsStack.push(getStepNext());
+  steps.push(getStepNext());
   animationInterval = setInterval(animation, TIME_DELTA);
   nextButton.disabled = true;
   prevButton.disabled = true;
@@ -223,15 +201,15 @@ function animation() {
       prevButton.disabled = numOfSteps === 0;
     }
     cars.forEach((car) => {
-      if (stepsStack.top().includes(car.carId)) {
+      if (steps.top().includes(car.carId)) {
         car.stage += isReversed ? -1 : 1;
       }
     });
-    if (isReversed) stepsStack.pop();
+    if (isReversed) steps.pop();
   } else {
     document.getElementById('step').innerHTML = `Step: ${numOfSteps}`;
     cars.forEach((car) => {
-      if (stepsStack.top().includes(car.carId)) {
+      if (steps.top().includes(car.carId)) {
         move(car, counter / FRAME_TIME, isReversed);
       }
     });
@@ -239,19 +217,16 @@ function animation() {
 }
 setInterval(() => renderer.render(scene, camera), 10);
 
-// counter
+// handle counters
 const decrementButtons = document.querySelectorAll(
   `button[data-action="decrement"]`,
 );
-
 const incrementButtons = document.querySelectorAll(
   `button[data-action="increment"]`,
 );
-
 decrementButtons.forEach((btn) => {
   btn.addEventListener('click', decrement);
 });
-
 incrementButtons.forEach((btn) => {
   btn.addEventListener('click', increment);
 });

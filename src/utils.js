@@ -75,6 +75,20 @@ const getInitialPosition = {
   }),
 };
 
+const getCarsConfig = (cars) =>
+  Object.keys(cars).map((key) => {
+    const car = cars[key];
+    return {
+      carId: parseInt(key),
+      trajectory: car.direction,
+      onLane: car.lane,
+      stage: 0,
+      position: getInitialPosition[car.lane](car),
+      targetLane: laneAdapter[car.targetLane],
+      order: car.order,
+    };
+  });
+
 function Text(string, size = 15) {
   // https://github.com/tamani-coding/threejs-text-example/blob/main/src/basic_scene.ts
   const geometry = new TextGeometry(string, {
@@ -119,14 +133,14 @@ function increment(e) {
 const cycleValidationFail = () => {
   alert('Please remove the cycle(s) first.');
 };
+
 export {
   Stack,
   getRotationZ,
   getRandomColor,
-  laneAdapter,
-  getInitialPosition,
   Text,
   decrement,
   increment,
   cycleValidationFail,
+  getCarsConfig,
 };
