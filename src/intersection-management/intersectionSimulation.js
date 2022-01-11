@@ -82,6 +82,7 @@ export default class extends IntersectionManagement {
       };
     });
     nodes.addClass(['cy-node-current']);
+    this.showCycle(this.showCycleFlag);
     return this.carPaths;
   }
 
